@@ -12,6 +12,15 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     var part_id = $scope.part_id = $stateParams.part_id;
     var part_value = "AnSwEr"+("0000"+part_id).slice(-4);
     var user_id = $scope.user_id = Session.user_id;
+
+    $scope.noOfPartsSoFar = [];
+    for (var i=1; i<=$scope.part_id; i++) {
+        $scope.noOfPartsSoFar.push("Part"+i);
+    }
+
+    $scope.dtOptions = DTOptionsBuilder.newOptions()
+        .withBootstrap().withDisplayLength(10);
+    
     $scope.hint_id = -1;
     $scope.input_id = null;
     $scope.linked_hint = null;
@@ -37,6 +46,34 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 answersByPart[value.part_id].push(value);
             });
             $scope.answers = answersByPart[part_id];
+    });
+
+
+    WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
+        success(function(data){
+            $scope.answersByPartAllUsers = {};
+            var temporaryMap = {};
+            var temporaryMap2 = {};
+            angular.forEach(data, function(value){
+                if (value.part_id <= $scope.part_id) {
+                    if (!temporaryMap[value.user_id]) {
+                       temporaryMap[value.user_id] = {};
+                    }
+                    temporaryMap[value.user_id][value.part_id] = value;
+                }
+            });
+            angular.forEach(temporaryMap, function(value) {
+                var curr_user_id = value["1"].user_id;
+                if (!$scope.answersByPartAllUsers[curr_user_id]) {
+                    $scope.answersByPartAllUsers[curr_user_id] = {};
+                }
+                $scope.answersByPartAllUsers[curr_user_id].user_id = curr_user_id;
+                for (var i=1; i<=$scope.noOfPartsSoFar.length;i++) {
+                    if (value[i]) {
+                        $scope.answersByPartAllUsers[curr_user_id]["Part"+i] = value[i].answer_string;
+                    }
+                }
+            });
     });
 
     /*WebworkService.groupedPartAnswers(course, set_id, problem_id, part_id).success(function(data){
