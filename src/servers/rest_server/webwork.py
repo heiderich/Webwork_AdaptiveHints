@@ -390,6 +390,26 @@ class AnswersByPart(ProcessQuery):
         result = conn.query(query)
         self.write(json.dumps(result, default=serialize_datetime))
 
+# GET /answers_by_part_all_users?
+class AnswersByPartAllUsers(ProcessQuery):
+    def get(self):
+        only_counts = self.get_argument('counts', False)
+        course = self.get_argument('course')
+        if not only_counts:
+            query_parts = ['select *  from {0}_answers_by_part'.format(
+                course)]
+            query_parts.append(self.where_clause('set_id', 'problem_id', 'part_id'))
+            query_parts.append('ORDER BY timestamp ASC;')
+
+        else:
+            query_parts = ['''SELECT set_id, problem_id, part_id, count(id) as attempt_count
+            FROM {course}_answers_by_part'''.format(course=course)]
+            query_parts.append(self.where_clause('set_id', 'problem_id', 'part_id'))
+            query_parts.append('GROUP BY set_id, problem_id, part_id;')
+        query = ' '.join(query_parts)
+        result = conn.query(query)
+        self.write(json.dumps(result, default=serialize_datetime))
+
 # GET /problem_status?
 class ProblemStatus(ProcessQuery):
     def get(self):
