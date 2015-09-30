@@ -60,6 +60,12 @@ App.factory('WebworkService', function($http, $window, $rootScope, $location, $q
                      {params: {course: course, set_id: set_id, problem_id: problem_id,
                                user_id: user_id, counts: true}});
         },
+        answersByPartAllUsers: function(course, set_id, problem_id, user_id, counts) {
+            return $http
+                .get(BASE_URL+'/answers_by_part_all_users',
+                     {params: {course: course, set_id: set_id, problem_id: problem_id,
+                               user_id: user_id, counts: counts}});
+        },
         render: function(pg_file, seed, psvn) {
             if(pg_file[0]!=='/'){ // Don't base64 encode absolute paths
                 pg_file = btoa(unescape(encodeURIComponent(pg_file)));
