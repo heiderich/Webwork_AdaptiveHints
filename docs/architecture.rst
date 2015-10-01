@@ -1,6 +1,6 @@
 .. _architecture:
 
-<div style="width: 480px; height: 360px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:480px; height:360px" src="https://www.lucidchart.com/documents/embeddedchart/38e8949f-0374-4d60-bc75-ffe2b8066347" id="59Vf853JvmwX"></iframe></div>
+![architecture block diagram](https://www.lucidchart.com/publicSegments/view/830486c1-1dfb-4193-9f85-e66665dcd1db/image.png)
 
 =============
 Architecture Overview
