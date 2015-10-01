@@ -4,13 +4,23 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                                            $sce, $timeout, $interval, $anchorScroll, $modal, $log,
                                            WebworkService, HintsService, SockJSService, APIHost,
                                            DTOptionsBuilder, DTColumnDefBuilder, MessageService,
-                                           Session){
+                                           Session, user_id_for_problem_render, password_for_problem_render){
 
     var course = $scope.course = $stateParams.course;
     var set_id = $scope.set_id = $stateParams.set_id;
     var problem_id = $scope.problem_id = $stateParams.problem_id;
     var part_id = $scope.part_id = $stateParams.part_id;
     var part_value = "AnSwEr"+("0000"+part_id).slice(-4);
+    var user_id = $scope.user_id = Session.user_id;
+
+    $scope.noOfPartsSoFar = [];
+    for (var i=1; i<=$scope.part_id; i++) {
+        $scope.noOfPartsSoFar.push("Part"+i);
+    }
+
+    $scope.dtOptions = DTOptionsBuilder.newOptions()
+        .withBootstrap().withDisplayLength(10);
+    
     $scope.hint_id = -1;
     $scope.input_id = null;
     $scope.linked_hint = null;
@@ -23,6 +33,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.filtered_students = [];
     $scope.filtered_groups = [];
 
+    $scope.user_webwork_url = 'http://'+APIHost+'/webwork2/'+course+'/'+set_id+
+        '/'+problem_id+'/?user='+user_id_for_problem_render+'&passwd='+password_for_problem_render+'&effectiveUser='+user_id;
+
     WebworkService.answersByPart(course, set_id, problem_id).
         success(function(data){
             var answersByPart = {};
@@ -33,6 +46,34 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 answersByPart[value.part_id].push(value);
             });
             $scope.answers = answersByPart[part_id];
+    });
+
+
+    WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
+        success(function(data){
+            $scope.answersByPartAllUsers = {};
+            var temporaryMap = {};
+            var temporaryMap2 = {};
+            angular.forEach(data, function(value){
+                if (value.part_id <= $scope.part_id) {
+                    if (!temporaryMap[value.user_id]) {
+                       temporaryMap[value.user_id] = {};
+                    }
+                    temporaryMap[value.user_id][value.part_id] = value;
+                }
+            });
+            angular.forEach(temporaryMap, function(value) {
+                var curr_user_id = value["1"].user_id;
+                if (!$scope.answersByPartAllUsers[curr_user_id]) {
+                    $scope.answersByPartAllUsers[curr_user_id] = {};
+                }
+                $scope.answersByPartAllUsers[curr_user_id].user_id = curr_user_id;
+                for (var i=1; i<=$scope.noOfPartsSoFar.length;i++) {
+                    if (value[i]) {
+                        $scope.answersByPartAllUsers[curr_user_id]["Part"+i] = value[i].answer_string;
+                    }
+                }
+            });
     });
 
     /*WebworkService.groupedPartAnswers(course, set_id, problem_id, part_id).success(function(data){
@@ -505,4 +546,47 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.linkHintDisabled = function(){
         return ($scope.filtered_students.length === 0 || $scope.filter_function.dirty || !$scope.selected_hint_id);
     };
+
+    /**
+     * Wait for the iFrame to get loaded and then extract the problem rendered in webwork and copy it here
+     */
+    $scope.checkIfIFrameLoaded = function() {
+        var iFrame = $("#iFrameToRenderProblem")[0];
+        if (iFrame && iFrame.contentDocument.readyState == "complete") {
+            if (iFrame.contentWindow.document.getElementsByClassName("problem-content")[0]) {
+                if ($(".PGML")[0]) {
+                    $(".PGML")[0].innerHTML = iFrame.contentWindow.document.getElementsByClassName("problem-content")[0].innerHTML;
+                    return;
+                } else if ($("#problem-content")[0]) {
+                    $("#problem-content")[0].innerHTML = iFrame.contentWindow.document.getElementsByClassName("problem-content")[0].innerHTML;
+                    return;
+                }
+            } else if (iFrame.contentWindow.document.getElementById("problem-content")) {
+                $("#problem-content")[0].innerHTML = iFrame.contentWindow.document.getElementById("problem-content").innerHTML;
+                return;
+            }
+        }
+        window.setTimeout(function() {
+            $scope.checkIfIFrameLoaded();
+        }, 250);
+    }
+
+    /**
+     * Open the problem from the webwork server from student POV. This enables to render the problem as its displayed for each student.
+     */
+    $scope.openProblemPageInIFrame = function() {
+        if ($("#iFrameToRenderProblem").length) {
+            $("#iFrameToRenderProblem")[0].parentNode.removeChild($("#iFrameToRenderProblem")[0]);
+        }
+        $("<iframe id='iFrameToRenderProblem' name='problemRender'>").appendTo("body");
+        $("#iFrameToRenderProblem").css("display", "none");
+
+        var srcUrl = $scope.user_webwork_url;
+        $("#iFrameToRenderProblem").attr("src", srcUrl);
+        $scope.checkIfIFrameLoaded();
+    }
+
+    window.setTimeout(function() {
+        $scope.openProblemPageInIFrame();
+    }, 250);
 });
