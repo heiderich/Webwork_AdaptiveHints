@@ -1,6 +1,6 @@
 .. _architecture:
 
-[Architecture Diagram](https://www.lucidchart.com/invitations/accept/4ca8a6c4-02b2-48fc-ad65-b5a2b1cb325e)
+<div style="width: 480px; height: 360px; margin: 10px; position: relative;"><iframe allowfullscreen frameborder="0" style="width:480px; height:360px" src="https://www.lucidchart.com/documents/embeddedchart/38e8949f-0374-4d60-bc75-ffe2b8066347" id="59Vf853JvmwX"></iframe></div>
 
 =============
 Architecture Overview
