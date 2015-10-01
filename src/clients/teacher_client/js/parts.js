@@ -10,8 +10,7 @@ App.controller('PartsCtrl', function($scope, $location, $window, $stateParams, $
     });
 
     $scope.dtOptions = DTOptionsBuilder.newOptions()
-        .withBootstrap().withDisplayLength(25);
-        //.withOption('paging', false);
+        .withOption('paging', false);
 
     $scope.dtColumnDefs = [
         DTColumnDefBuilder.newColumnDef(0),
@@ -29,5 +28,4 @@ App.controller('PartsCtrl', function($scope, $location, $window, $stateParams, $
         });
         loadedDT.DataTable && loadedDT.DataTable.search("week").draw();
     });
-
 });

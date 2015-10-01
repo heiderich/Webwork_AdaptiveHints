@@ -8,7 +8,7 @@ from checkanswer import CheckAnswer
 from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
                      RealtimeUserProblemAnswers, RealtimeProblemAnswer,
                      SetIds, Sets, Problems, ExportProblemData, AnswersByPart,
-                     ProblemStatus, ProblemPartStatus, SetPsvn)
+                     ProblemStatus, ProblemPartStatus, SetPsvn, AnswersByPartAllUsers)
 from hints_api import (UserProblemHints, Hint, AssignedHint,
                        ProblemHints, HintFeedback, RunHintFilters,
                        HintFilter, AssignedHintFilter,
@@ -48,6 +48,9 @@ if __name__ == "__main__":
                                                    backupCount=5)
     handler.setFormatter(formatter)
     logger.addHandler(handler)
+    logger.debug('debugging started')
+    print 'logging started'
+
     # Application server
     application = tornado.web.Application([
         (r"/render", Render),
@@ -82,7 +85,8 @@ if __name__ == "__main__":
         (r"/export_problem_data", ExportProblemData),
         (r"/filter_answers", FilterAnswers),
         (r"/filter_functions", FilterFunctions),
-        (r"/assigned_filter_functions", AssignedFilterFunctions)
+        (r"/assigned_filter_functions", AssignedFilterFunctions),
+        (r"/answers_by_part_all_users", AnswersByPartAllUsers)
     ], gzip=True, debug=True)
     # Start server
     application.listen(args.port, address=BIND_IP)
