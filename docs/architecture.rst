@@ -1,5 +1,7 @@
 .. _architecture:
 
+[Architecture Diagram](https://www.lucidchart.com/invitations/accept/4ca8a6c4-02b2-48fc-ad65-b5a2b1cb325e)
+
 =============
 Architecture Overview
 =============
