@@ -62,7 +62,7 @@
 
     <div id="attempts_area">
       <h3>Attempts so far</h3>
-      <table class="table" id="attempts_table" datatable="ng" dt-options="dtOptions" dt-column-defs="dtColumnDefs">
+      <table class="table" id="attempts_table" datatable="ng" dt-options="dtOptions1" dt-column-defs="dtColumnDefs1">
         <thead>
           <tr>
             <th>Student</th>
@@ -97,7 +97,7 @@
     <section id="filter_function" style="padding-bottom:20px;" collapse="!showFilterFunction">
 
       <h4>Filter Library</h4>
-      <table class="table" id="filter_table" datatable="ng" dt-options="dtOptions" dt-column-defs="dtColumnDefs">
+      <table class="table" id="filter_table" datatable="ng2" dt-options="dtOptions2" dt-column-defs="dtColumnDefs2">
         <thead>
           <tr>
             <th>Filter Name</th>
@@ -109,14 +109,22 @@
           <tr ng-repeat="filter in filter_functions" dt-rows="" ng-click="show_filter_code(filter.code)">
             <td>{{filter.name}}</td>
             <td>{{filter.code}}</td>
+            <td>{{filter.type}}</td>
             <td>{{filter.author}}</td>
           </tr>
         </tbody>
       </table>
-      <div>
+      <div id="filter_code_read_only_container" class="hidden">
+        <h5>Filter Code</h>
+        <pre id="filter_code_read_only"></pre>
+      </div>
+      <div style="clear: both;">
         <p id="filter_code_text" class="well hidden">
         </p>
       </div>
+      Filter Name <input id="filter_function_name"/>
+      Filter Type <select id="filter_function_type"><option value="C">Conditional</option><option value="U">Universal</option></select>
+      <button type="button" class="btn btn-primary btn-xs" ng-click="generate_filter_template()">Generate Filter Template</button>
       <form class="form-inline">
         <div ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
         <div class="row">

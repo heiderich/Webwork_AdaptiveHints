@@ -18,8 +18,19 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         $scope.noOfPartsSoFar.push("Part"+i);
     }
 
-    $scope.dtOptions = DTOptionsBuilder.newOptions()
-        .withBootstrap().withDisplayLength(10);
+    $scope.dtOptions1 = {
+        bDestroy: true,
+        iDisplayLength: 10,
+        integrateBootstrap: true
+    }
+
+    $scope.dtOptions2 = {
+        bDestroy: true,
+        iDisplayLength: 10,
+        integrateBootstrap: true
+    }
+
+    $scope.filter_functions = [];
     
     $scope.hint_id = -1;
     $scope.input_id = null;
@@ -32,6 +43,8 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.hints = [];
     $scope.filtered_students = [];
     $scope.filtered_groups = [];
+
+    $scope.filter_function_name = "answer_filter";
 
     $scope.user_webwork_url = 'http://'+APIHost+'/webwork2/'+course+'/'+set_id+
         '/'+problem_id+'/?user='+user_id_for_problem_render+'&passwd='+password_for_problem_render+'&effectiveUser='+user_id;
@@ -51,6 +64,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
         success(function(data){
+            $("#attempts_table").DataTable().destroy();  
             $scope.answersByPartAllUsers = {};
             var temporaryMap = {};
             var temporaryMap2 = {};
@@ -416,15 +430,19 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 	    matchBrackets: true
     };
 
-    $scope.filter_function = {
-        code: "def answer_filter(params):\n  "
-            + "# params = [answer_string, parse_tree, eval_tree, correct_string, correct_tree, correct_eval, user_vars] \n"
-            + "  import json\n  print json.dumps(params)\n  return False",
-        author: Session.user_id,
-        course: course,
-        dirty: true,
-        name: null
-    };
+    $scope.populate_filter_function = function() {
+        $scope.filter_function = {
+            code: "def " + $scope.filter_function_name + "(params):\n  "
+                + "# params = [answer_string, parse_tree, eval_tree, correct_string, correct_tree, correct_eval, user_vars] \n"
+                + "  import json\n  print json.dumps(params)\n  return False",
+            author: Session.user_id,
+            course: course,
+            dirty: true,
+            name: null
+        };
+    }
+
+    $scope.populate_filter_function();
 
     function group_filter_output(){
         $scope.filter_group = {};
@@ -514,6 +532,12 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         ff.dirty = false;
     };
 
+    $scope.generate_filter_template = function() {
+        var filter_type = $("#filter_function_type").val();
+        $scope.filter_function_name = filter_type + "_" + $scope.set_id + "_" + $scope.problem_id + "_" + $scope.part_id + "_" + $("#filter_function_name").val();
+        $scope.populate_filter_function();
+    }
+
     $scope.load_filter = function(){
         HintsService.getFilterFunctions({name: $scope.filter_function.name}).
             success(function(data){
@@ -589,4 +613,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     window.setTimeout(function() {
         $scope.openProblemPageInIFrame();
     }, 250);
+
+    $scope.show_filter_code = function(filter_code) {
+        $("#filter_code_read_only_container").removeClass("hidden");
+        $("#filter_code_read_only").html(filter_code);
+    }
 });
