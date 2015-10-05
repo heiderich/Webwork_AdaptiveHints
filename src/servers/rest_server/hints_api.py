@@ -7,7 +7,8 @@ import logging
 from tornado.template import Template
 from convert_timestamp import utc_to_system_timestamp
 from process_query import ProcessQuery, conn
-from hint_filters.AllFilters import hint_filters
+#from hint_filters.AllFilters import hint_filters
+import filters
 from operator import itemgetter
 import pandas as pd
 from datetime import datetime
@@ -351,63 +352,64 @@ class ProblemHints(ProcessQuery):
         self.process_query(query_template, dehydrate=self.add_header_footer)
 
 
-class RunHintFilters(ProcessQuery):
-    ''' Given a user and problem part (a particular box where expressions are
-        entered), scan HintFilter's and assignment/answer histories to
-        determine whether a hint should be assigned to this user/box '''
+# class RunHintFilters(ProcessQuery):
+#     ''' Given a user and problem part (a particular box where expressions are
+#         entered), scan HintFilter's and assignment/answer histories to
+#         determine whether a hint should be assigned to this user/box '''
 
-    def check_hint_assignment(self, rows):
-        ''' Given the course, user_id, set_id, problem_id, and pg_id,
-            return a pandas DataFrame containing the rows in the mysql
-            realtime_past_answers table that match the given args
-             '''
-        # Convert the context of the student struggling on the particular part
-        # to a pandas DataFrame
-        df = pd.DataFrame(rows)
-        # Go through each entry in the assigned_hint_filter table.
-        # Find matches for
-        query_template = ''' SELECT hint_filter.filter_name,
-                assigned_hint_filter.hint_id,
-                assigned_hint_filter.trigger_cond,
-                hint.set_id, hint.problem_id
-            FROM {{course}}_hint_filter AS hint_filter
-            JOIN {{course}}_assigned_hint_filter as assigned_hint_filter
-            ON assigned_hint_filter.hint_filter_id = hint_filter.id
-            JOIN {{course}}_hint as hint ON assigned_hint_filter.hint_id = hint.id
-            WHERE hint.set_id = '{{set_id}}' AND hint.problem_id = {{problem_id}}
-        '''
-        query_rendered = Template(query_template).generate(**self.args)
-        hint_filters_dict = dict( (f.__name__, f) for f in hint_filters)
-        assigned_hint_filters = conn.query(query_rendered)
-        hint_ids_to_assign = set([])
-        for assigned_hint_filter in assigned_hint_filters:
-            filter_name = assigned_hint_filter['filter_name']
-            hint_id = assigned_hint_filter['hint_id']
-            trigger_cond = assigned_hint_filter['trigger_cond']
-            hint_filter = hint_filters_dict[filter_name]
-            self.args['hint_id'] = hint_id
-            # Get a list of other places the hint has been assigned
-            query_template = '''
-                select {{course}}_assigned_hint.*
-                from {{course}}_hint, {{course}}_assigned_hint
-                where {{course}}_assigned_hint.hint_id={{course}}_hint.id
-                    and {{course}}_hint.id = {{hint_id}}
-            '''
-            query_rendered = Template(query_template).generate(**self.args)
-            previous_hint_assignments = conn.query(query_rendered)
-            if hint_filter(self.args, df, previous_hint_assignments, trigger_cond):
-                hint_ids_to_assign.add(hint_id)
-        return list(hint_ids_to_assign)
+#     def check_hint_assignment(self, rows):
+#         ''' Given the course, user_id, set_id, problem_id, and pg_id,
+#             return a pandas DataFrame containing the rows in the mysql
+#             realtime_past_answers table that match the given args
+#              '''
+#         # Convert the context of the student struggling on the particular part
+#         # to a pandas DataFrame
+#         df = pd.DataFrame(rows)
+#         # Go through each entry in the assigned_hint_filter table.
+#         # Find matches for
+#         query_template = ''' SELECT hint_filter.filter_name,
+#                 assigned_hint_filter.hint_id,
+#                 assigned_hint_filter.trigger_cond,
+#                 hint.set_id, hint.problem_id
+#             FROM {{course}}_hint_filter AS hint_filter
+#             JOIN {{course}}_assigned_hint_filter as assigned_hint_filter
+#             ON assigned_hint_filter.hint_filter_id = hint_filter.id
+#             JOIN {{course}}_hint as hint ON assigned_hint_filter.hint_id = hint.id
+#             WHERE hint.set_id = '{{set_id}}' AND hint.problem_id = {{problem_id}}
+#         '''
+#         query_rendered = Template(query_template).generate(**self.args)
+#         #hint_filters_dict = dict( (f.__name__, f) for f in filters)
+#         hint_filters_dict ={}
+#         assigned_hint_filters = conn.query(query_rendered)
+#         hint_ids_to_assign = set([])
+#         for assigned_hint_filter in assigned_hint_filters:
+#             filter_name = assigned_hint_filter['filter_name']
+#             hint_id = assigned_hint_filter['hint_id']
+#             trigger_cond = assigned_hint_filter['trigger_cond']
+#             hint_filter = hint_filters_dict[filter_name]
+#             self.args['hint_id'] = hint_id
+#             # Get a list of other places the hint has been assigned
+#             query_template = '''
+#                 select {{course}}_assigned_hint.*
+#                 from {{course}}_hint, {{course}}_assigned_hint
+#                 where {{course}}_assigned_hint.hint_id={{course}}_hint.id
+#                     and {{course}}_hint.id = {{hint_id}}
+#             '''
+#             query_rendered = Template(query_template).generate(**self.args)
+#             previous_hint_assignments = conn.query(query_rendered)
+#             if hint_filter(self.args, df, previous_hint_assignments, trigger_cond):
+#                 hint_ids_to_assign.add(hint_id)
+#         return list(hint_ids_to_assign)
 
 
-    def get(self):
-        query_template = ''' select * from {{course}}_realtime_past_answer
-            where set_id="{{set_id}}" and
-            problem_id={{problem_id}} and
-            pg_id="{{pg_id}}" and
-            user_id="{{user_id}}"
-        '''
-        self.process_query(query_template, dehydrate=self.check_hint_assignment)
+#     def get(self):
+#         query_template = ''' select * from {{course}}_realtime_past_answer
+#             where set_id="{{set_id}}" and
+#             problem_id={{problem_id}} and
+#             pg_id="{{pg_id}}" and
+#             user_id="{{user_id}}"
+#         '''
+#         self.process_query(query_template, dehydrate=self.check_hint_assignment)
 
 class HintFilter(ProcessQuery):
 
