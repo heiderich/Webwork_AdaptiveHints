@@ -9,12 +9,10 @@ from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
                      RealtimeUserProblemAnswers, RealtimeProblemAnswer,
                      SetIds, Sets, Problems, ExportProblemData, AnswersByPart,
                      ProblemStatus, ProblemPartStatus, SetPsvn, AnswersByPartAllUsers)
-from hints_api import (UserProblemHints, Hint, AssignedHint,
-                       ProblemHints, HintFeedback, RunHintFilters,
-                       HintFilter, AssignedHintFilter,
+from hints_api import (AssignedHint, AssignedHintFilter,
                        AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem)
-from filter_api import (FilterFunctions, ApplyFilterFunctions,
-                        AssignedFilterFunctions)
+#                      UserProblemHints, Hint, ProblemHints, HintFeedback, RunHintFilters, HintFilter)
+from filter_api import (FilterFunctions, ApplyFilterFunctions, AssignedFilterFunctions)
 
 from auth import (Login)
 from parsers import ParseString, GroupedPartAnswers, FilterAnswers
@@ -59,20 +57,20 @@ if __name__ == "__main__":
         (r"/set_psvn", SetPsvn),
         (r"/pg_path", ProblemPGPath),
         (r"/pg_file", ProblemPGFile),
-        (r"/user_problem_hints", UserProblemHints),
-        (r"/hint", Hint),
+        #(r"/user_problem_hints", UserProblemHints),
+        #(r"/hint", Hint),
         (r"/assigned_hint", AssignedHint),
         (r"/assigned_hint_history_by_hint_id", AssignedHintHistoryByHintID),
         (r"/assigned_hint_history_by_problem_part", AssignedHintHistoryByProblemPart),
         (r"/assigned_hint_history_of_problem", AssignedHintHistoryofProblem),
-        (r"/realtime_user_problem_answers", RealtimeUserProblemAnswers),
-        (r"/problem_hints", ProblemHints),
-        (r"/realtime_problem_answer", RealtimeProblemAnswer),
-        (r"/hint_feedback", HintFeedback),
-        (r"/run_hint_filters", RunHintFilters),
-        (r"/apply_filter_functions", ApplyFilterFunctions),
-        (r"/hint_filter", HintFilter),
         (r"/assigned_hint_filter", AssignedHintFilter),
+        (r"/realtime_user_problem_answers", RealtimeUserProblemAnswers),
+        #(r"/problem_hints", ProblemHints),
+        (r"/realtime_problem_answer", RealtimeProblemAnswer),
+        #(r"/hint_feedback", HintFeedback),
+        #(r"/run_hint_filters", RunHintFilters),
+        (r"/apply_filter_functions", ApplyFilterFunctions),
+        #(r"/hint_filter", HintFilter),
         (r"/set_ids", SetIds),
         (r"/sets", Sets),
         (r"/problems", Problems),

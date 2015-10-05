@@ -1,3 +1,6 @@
+##### work with filter functions from database #####
+
+import os.path
 import tornado
 import simplejson as json
 import tornado.ioloop
@@ -22,6 +25,7 @@ from parsers import parse_eval
 from pg_utils import get_source, get_part_answer
 from webwork_utils import get_user_vars, vars_for_student, answer_for_student
 from exec_filters import filtered_answers
+from filter_bank import filter_bank
 tz = tzlocal()
 
 
@@ -36,6 +40,11 @@ BASE = '/opt/AdaptiveHintsFilters'
 
 class FilterFunctions(ProcessQuery):
     """ /filter_functions """
+
+    # def __init__(self):
+    #     self.a_filter_bank = filter_bank()
+    #     self.a_filter_bank.import_filters_from_files('filter_helpers/')
+    #     self.a_filter_bank.import_filters_from_files('filters/')
 
     def set_default_headers(self):
         # Allows X-site requests
@@ -63,12 +72,25 @@ class FilterFunctions(ProcessQuery):
             ]
         '''
 
-        allowed_args = self.filtered_arguments('id', 'set_id', 'problem_id', 'name', 'author', 'course')
-        where = self.where_clause(**allowed_args)
-        query = '''select * from filter_functions {WHERE};'''.format(WHERE=where)
-        logger.debug(query)
-        rows = conn.query(query)
-        self.write(json.dumps(rows, default=serialize_datetime))
+        allowed_args = self.filtered_arguments('id', 'set_id', 'problem_id', 'name', 'author', 'course', 'function_type')
+        #where = self.where_clause(**allowed_args)
+        #query = '''select * from filter_functions {WHERE};'''.format(WHERE=where)
+        #logger.debug(query)
+        #rows = conn.query(query)
+        #self.write(json.dumps(rows, default=serialize_datetime))
+
+        # load from folder
+        a_filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        logger.info(basepath)
+        filters_path = os.path.join(basepath, "../filters/")
+        a_filter_bank.import_filters_from_files(filters_path)
+        files = a_filter_bank.get_env_keys()
+        functions = []
+        for f in files:
+            if f[0] != "_":
+                functions += [{'name': f, 'code': a_filter_bank.get_code(filters_path, f), 'doc': a_filter_bank.get_docstring(f)}]
+        self.write(json.dumps(functions, default=serialize_datetime))
 
     def post(self):
         ''' For creating filter functions. '''
@@ -78,36 +100,69 @@ class FilterFunctions(ProcessQuery):
         author = self.get_argument('author')
         name = self.get_argument('name')
         code = self.get_argument('code')
+        function_type = self.get_argument('function_type')
+
+
         # Create dummy hint first
-        create_hint ='''insert into {course}_hint
-            (pg_text, author, set_id, problem_id, part_id) values
-            ("", "{author}", "DummyHints", 1, 1)
-        '''.format(course=course, author=author)
-        hint_id = conn.execute(create_hint)
-        logger.debug(hint_id)
+        #create_hint ='''insert into {course}_hint
+        #    (pg_text, author, set_id, problem_id, part_id) values
+        #    ("", "{author}", "DummyHints", 1, 1)
+        #'''.format(course=course, author=author)
+        #hint_id = conn.execute(create_hint)
+        #logger.debug(hint_id)
         now = datetime.now().isoformat()
-        create_filter_function = ''' INSERT INTO filter_functions
-        (name, course, author, set_id, problem_id, dummy_hint_id, code, created, updated)
-        values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, {hint_id}, "{code}", "{created}", "{updated}");
-        '''.format(name=name, course=course, author=author, set_id=set_id,
-                   problem_id=problem_id, hint_id=hint_id, code=code,
-                   created=now, updated=now)
-        ret = conn.execute(create_filter_function) # Returns row ID
+        #create_filter_function = ''' INSERT INTO filter_functions
+        #(name, course, author, set_id, problem_id, code, created, updated, function_type)
+        #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{created}", "{updated}", "{function_type}");
+        #'''.format(name=name, course=course, author=author, set_id=set_id,
+        #           problem_id=problem_id, code=code, created=now,
+        #           updated=now, function_type=function_type)
+        #create_filter_function = ''' INSERT INTO filter_functions
+        #(name, course, author, set_id, problem_id, dummy_hint_id, code, created, updated)
+        #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, {hint_id}, "{code}", "{created}", "{updated}");
+        #'''.format(name=name, course=course, author=author, set_id=set_id,
+        #           problem_id=problem_id, hint_id=hint_id, code=code, created=now,
+        #           updated=now)
+        #ret = conn.execute(create_filter_function) # Returns row ID
+
+        # add filter function in filters folder
+        a_filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filters_path = os.path.join(basepath, "../filters")
+        filter_helpers_path = os.path.join(basepath, "../filter_helpers")
+        a_filter_bank.import_filters_from_files(filter_helpers_path)
+        a_filter_bank.import_filters_from_files(filters_path)
+        a_filter_bank.add_filter(name,code)
+        save_to = os.path.abspath(os.path.join(basepath, "..", "filters", name))
+        with open(save_to+'.py', 'w') as f:
+            f.write(code)
+
         self.write(json.dumps(ret))
 
     def put(self):
         id = self.get_argument('id')
+        name = self.get_argument('name')
         logger.debug(id)
         code = self.get_argument('code')
         now = datetime.now().isoformat()
-        query = ''' UPDATE filter_functions SET
-        code = "{code}", updated = "{time}"
-        WHERE id={id};'''.format(code=code, time=now, id=id)
-        get_query = ''' SELECT * FROM filter_functions where '''
-        logger.debug(query)
-        ret = conn.execute(query)
-        self.write(json.dumps(ret))
-        logger.debug(self.filter_path(id))
+        # update in database
+        #query = ''' UPDATE filter_functions SET
+        #code = "{code}", updated = "{time}"
+        #WHERE id={id};'''.format(code=code, time=now, id=id)
+        #get_query = ''' SELECT * FROM filter_functions where '''
+        #logger.debug(query)
+        #ret = conn.execute(query)
+
+        # update in filters folder
+        a_filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filters_path = os.path.join(basepath, "../filters")
+        filter_helpers_path = os.path.join(basepath, "../filter_helpers")
+        a_filter_bank.import_filters_from_files(filter_helpers_path)
+        a_filter_bank.import_filters_from_files(filters_path)
+        a_filter_bank.add_filter(name,code)
+        #self.write(json.dumps(ret))
+        #logger.debug(self.filter_path(id))
         
     def delete(self):
         pass
@@ -156,25 +211,26 @@ class ApplyFilterFunctions(ProcessQuery):
         part_id = int(self.get_argument('part_id'))
         user_id = self.get_argument('part_id')
         answer_string = self.get_argument('answer_string')
+        function_type = self.get_argument('function_type')
         pg_file = self.get_source()
         # Only run filters if at least 3 answers and at least 10 minutes since first answer
-        try:
-            answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
-                                    .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('count')
-            first_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
-        ORDER BY timestamp ASC LIMIT 1;'''
-                                    .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
-            last_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
-        ORDER BY timestamp DESC LIMIT 1;'''
-                                   .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
-            diff = last_answer-first_answer
-            if answer_count < 3 or diff < timedelta(minutes=10):
-                self.write(json.dumps({}))
-                return
-        except:
-            logger.warn('Error')
-            self.write(json.dumps({}))
-            return
+        # try:
+        #     answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
+        #                             .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('count')
+        #     first_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
+        # ORDER BY timestamp ASC LIMIT 1;'''
+        #                             .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
+        #     last_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
+        # ORDER BY timestamp DESC LIMIT 1;'''
+        #                            .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
+        #     diff = last_answer-first_answer
+        #     if answer_count < 3 or diff < timedelta(minutes=10):
+        #         self.write(json.dumps({}))
+        #         return
+        # except:
+        #     logger.warn('Error')
+        #     self.write(json.dumps({}))
+        #     return
         # Get any hints already assigned to user
         hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
                                     .format(course=course,
@@ -196,15 +252,22 @@ class ApplyFilterFunctions(ProcessQuery):
         answer_data = {'string': answer_string, 'parsed': ptree, 'evaled': etree,
                        'correct_string': part_answer, 'correct_tree': answer_ptree,
                        'correct_eval': answer_etree}
-        filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
+        #get conditional filter functions
+        conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
         af.problem_id, af.part_id FROM filter_functions as ff
         JOIN assigned_filters as af ON af.filter_function_id = ff.id
         WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id};'''.
                                   format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
-        logger.debug('Filters: %s', filter_funcs)
+        #get universal filter functions
+        universal_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
+        af.problem_id, af.part_id FROM filter_functions as ff
+        JOIN assigned_filters as af ON af.filter_function_id = ff.id
+        WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id};'''.
+                                  format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
+        #logger.debug('Filters: %s', filter_funcs)
 
         ret = {}
-        for func in filter_funcs:
+        for func in conditional_filter_funcs:
             if func.hint_id in hints_assigned:
                 continue
             code = func['code']

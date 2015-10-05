@@ -11,6 +11,7 @@ import json
 import traceback
 from TimeoutError import timeout # a decorator that creates a time-out interrupt for a given function.
 import StringIO
+import inspect
 
 class filter_bank:
     def __init__(self):
@@ -32,6 +33,14 @@ class filter_bank:
     def get_docstring(self,filter_name):
         if self.env.has_key(filter_name):
             return self.env[filter_name].__doc__
+        else:
+            return 'no filter named '+filter_name
+
+    def get_code(self, filter_dir, filter_name):
+        if self.env.has_key(filter_name):
+            with open(filter_dir+filter_name+".py", 'r') as f:
+                f.readline()
+                return f.read()
         else:
             return 'no filter named '+filter_name
     

@@ -16,11 +16,11 @@ App.factory('WebworkService', function($http, $window, $rootScope, $location, $q
                 .get(BASE_URL+'/problems',
                      {params: {course: course, set_id: set_id}});
         },
-        problemHints: function(course, set_id, problem_id) {
+        /*problemHints: function(course, set_id, problem_id) {
             return $http
                 .get(BASE_URL+'/problem_hints',
                      {params: {course: course, set_id: set_id, problem_id: problem_id}});
-        },
+        },*/
         exportProblemData: function(course, set_id, problem_id) {
             return $http
                 .get(BASE_URL+'/export_problem_data',
