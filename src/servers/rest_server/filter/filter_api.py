@@ -6,6 +6,8 @@ import simplejson as json
 import tornado.ioloop
 import tornado.web
 import logging
+import random
+import tempfile
 
 from tornado.template import Template
 from convert_timestamp import utc_to_system_timestamp
@@ -26,6 +28,7 @@ from pg_utils import get_source, get_part_answer
 from webwork_utils import get_user_vars, vars_for_student, answer_for_student
 from exec_filters import filtered_answers
 from filter_bank import filter_bank
+from pg_wrapper import render_pg_xmlrpc
 tz = tzlocal()
 
 
@@ -82,7 +85,6 @@ class FilterFunctions(ProcessQuery):
         # load from folder
         a_filter_bank = filter_bank()
         basepath = os.path.dirname(__file__)
-        logger.info(basepath)
         filters_path = os.path.join(basepath, "../filters/")
         a_filter_bank.import_filters_from_files(filters_path)
         files = a_filter_bank.get_env_keys()
@@ -100,30 +102,29 @@ class FilterFunctions(ProcessQuery):
         author = self.get_argument('author')
         name = self.get_argument('name')
         code = self.get_argument('code')
-        function_type = self.get_argument('function_type')
-
+        function_type = name[0]
 
         # Create dummy hint first
-        #create_hint ='''insert into {course}_hint
+        # create_hint ='''insert into {course}_hint
         #    (pg_text, author, set_id, problem_id, part_id) values
         #    ("", "{author}", "DummyHints", 1, 1)
         #'''.format(course=course, author=author)
         #hint_id = conn.execute(create_hint)
         #logger.debug(hint_id)
         now = datetime.now().isoformat()
-        #create_filter_function = ''' INSERT INTO filter_functions
-        #(name, course, author, set_id, problem_id, code, created, updated, function_type)
-        #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{created}", "{updated}", "{function_type}");
-        #'''.format(name=name, course=course, author=author, set_id=set_id,
-        #           problem_id=problem_id, code=code, created=now,
-        #           updated=now, function_type=function_type)
+        create_filter_function = ''' INSERT INTO filter_functions
+        (name, course, author, set_id, problem_id, code, created, updated, function_type)
+        values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{created}", "{updated}", "{function_type}");
+        '''.format(name=name, course=course, author=author, set_id=set_id,
+                   problem_id=problem_id, code=code, created=now,
+                   updated=now, function_type=function_type)
         #create_filter_function = ''' INSERT INTO filter_functions
         #(name, course, author, set_id, problem_id, dummy_hint_id, code, created, updated)
         #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, {hint_id}, "{code}", "{created}", "{updated}");
         #'''.format(name=name, course=course, author=author, set_id=set_id,
         #           problem_id=problem_id, hint_id=hint_id, code=code, created=now,
         #           updated=now)
-        #ret = conn.execute(create_filter_function) # Returns row ID
+        ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
         a_filter_bank = filter_bank()
@@ -173,13 +174,14 @@ def apply_filter(answer_data, user_vars, filter_function_string, pipe):
     import StringIO
     import tempfile
     USER_ID=1009
-
     tempdir = tempfile.mkdtemp()
     os.chown(tempdir, USER_ID, -1)
     os.chroot(tempdir)
     os.setuid(USER_ID)
 
     try:
+        logger.info("string")
+        logger.info(filter_function_string)
         exec filter_function_string in globals(), locals()
         a = answer_data
         # This function must be defined by the exec'd code
@@ -199,19 +201,16 @@ class ApplyFilterFunctions(ProcessQuery):
         self.add_header("Access-Control-Allow-Methods", "PUT,DELETE")
 
     def post(self):
-        '''
+        """
         Tests one student's answer against the filters defined for the problem part.
-
-        For any filters which match, returns the hint_id of the matched hint and
-        optionally, any PGML which should be inserted into the hint.
-        '''
+        For any filters which match, returns the matched hint(PGML) which should be inserted into the hint.
+        """
         course = self.get_argument('course')
         set_id = self.get_argument('set_id')
         problem_id = self.get_argument('problem_id')
         part_id = int(self.get_argument('part_id'))
-        user_id = self.get_argument('part_id')
+        user_id = self.get_argument('user_id')
         answer_string = self.get_argument('answer_string')
-        function_type = self.get_argument('function_type')
         pg_file = self.get_source()
         # Only run filters if at least 3 answers and at least 10 minutes since first answer
         # try:
@@ -232,11 +231,11 @@ class ApplyFilterFunctions(ProcessQuery):
         #     self.write(json.dumps({}))
         #     return
         # Get any hints already assigned to user
-        hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
-                                    .format(course=course,
-                                            WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
-                                            part_id=part_id))
-        hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
+        #hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
+        #                            .format(course=course,
+        #                                    WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
+        #                                    part_id=part_id))
+        #hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
         # Get student's variables, parse their answer, their correct answer
         user_variables = conn.query('''SELECT * from {course}_user_variables
         WHERE set_id="{set_id}" AND problem_id = {problem_id} AND user_id = "{user_id}";
@@ -252,43 +251,95 @@ class ApplyFilterFunctions(ProcessQuery):
         answer_data = {'string': answer_string, 'parsed': ptree, 'evaled': etree,
                        'correct_string': part_answer, 'correct_tree': answer_ptree,
                        'correct_eval': answer_etree}
-        #get conditional filter functions
-        conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
-        af.problem_id, af.part_id FROM filter_functions as ff
-        JOIN assigned_filters as af ON af.filter_function_id = ff.id
-        WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id};'''.
-                                  format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
-        #get universal filter functions
-        universal_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
-        af.problem_id, af.part_id FROM filter_functions as ff
-        JOIN assigned_filters as af ON af.filter_function_id = ff.id
-        WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id};'''.
-                                  format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
+        # #get conditional filter functions
+        # conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
+        # af.problem_id, af.part_id FROM filter_functions as ff
+        # JOIN assigned_filters as af ON af.filter_function_id = ff.id
+        # WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id} AND af.function_type='C';'''.
+        #                           format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
+        # logger.info("Conditional Filter Functions:")
+        # logger.info(conditional_filter_funcs)
+        # #get universal filter functions
+        # universal_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
+        # af.problem_id, af.part_id FROM filter_functions as ff
+        # JOIN assigned_filters as af ON af.filter_function_id = ff.id
+        # WHERE af.course='{course}' AND af.set_id='{set_id}' AND af.problem_id={problem_id} AND af.part_id={part_id} AND af.function_type='U';'''.
+        #                           format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id))
+        # logger.info("Universal Filter Functions:")
+        # logger.info(universal_filter_funcs)
         #logger.debug('Filters: %s', filter_funcs)
 
-        ret = {}
-        for func in conditional_filter_funcs:
-            if func.hint_id in hints_assigned:
-                continue
-            code = func['code']
-            parent, child = Pipe()
-            p = Process(target=apply_filter, args=(answer_data, user_variables, code, child))
-            p.start()
-            # TODO Can we do this without blocking the process?
-            p.join(timeout=15)
-            if p.is_alive():
-                logger.warn("Function took too long, we killed it.")
-                p.terminate()
-                ret[func.hint_id] = None
-            else:
-                result = parent.recv()
-                logger.debug("Got this back: %s", result)
-                if type(result) == str:
-                    ret[func.hint_id] = result
-                else:
-                    ret[func.hint_id] = None
+        # load from folder
+        a_filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        logger.info(basepath)
+        filters_path = os.path.join(basepath, "../filters/")
+        a_filter_bank.import_filters_from_files(filters_path)
+        files = a_filter_bank.get_env_keys()
+        con_filter_funcs = []
+        uni_filter_funcs = []
+        time_filter_funcs = []
+        for f in files:
+            if f[0] != '_':
+                code = a_filter_bank.get_code(filters_path, f)
+                while '\"\"\"' in code:
+                    code = code[code.index('\"\"\"')+3:]
+            if f[0] == "C":
+                con_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
+            elif f[0] == "U":
+                uni_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
+            elif f[0] == "T":
+                time_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
 
+        txt = None
+        for func in con_filter_funcs:
+            #if func.hint_id in hints_assigned:
+            #    continue
+            txt = a_filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
+        if not txt:
+            for func in uni_filter_funcs:
+                txt = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+        if not txt:
+            #TODO: add time based condition
+            for func in time_filter_funcs:
+                txt = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+        #TODO: handle the case where none of the condition apply
+        logger.info("matched hint %s", txt)
+
+        # Send hint with 50% chance
+        send = bool(random.getrandbits(1))
+        # # create a temp file
+        # temp = tempfile.NamedTemporaryFile(delete=False)
+        # temp.write(txt)
+        # temp.close()
+        # # render hint
+        ret = {}
+        ret['hint_html'] = txt
+        ret['location'] = "AnSwEr"+("0000"+str(part_id))[-4:]
+        ret['hintbox_id'] = 0
+        ret['assigned'] = int(send)
         self.write(json.dumps(ret))
+
+    def exec_filter_func(self, code, answer_data, user_variables):
+        parent, child = Pipe()
+        p = Process(target=apply_filter, args=(answer_data, user_variables, code, child))
+        p.start()
+        # TODO Can we do this without blocking the process?
+        p.join(timeout=15)
+        if p.is_alive():
+            logger.warn("Function took too long, we killed it.")
+            p.terminate()
+            #ret[func.hint_id] = None
+            return ""
+        else:
+            result = parent.recv()
+            logger.debug("Got this back: %s", result)
+            if type(result) == str:
+                #ret[func.hint_id] = result
+                return result
+            else:
+                #ret[func.hint_id] = None
+                return ""
 
 class AssignedFilterFunctions(ProcessQuery):
     def get(self):
