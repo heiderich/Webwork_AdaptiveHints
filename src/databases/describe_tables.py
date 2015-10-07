@@ -1,14 +1,14 @@
+import sys,os
+sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__))+'/../servers'))
 from rest_server.webwork_config import mysql_username, mysql_password
-try:
-    import mysql.connector
-except:
-    print "mysql-connector is not installded, run:\nsudo pip install --allow-external mysql-connector-python mysql-connector-python"
 import pandas as pd
 import numpy as np
-import sys
+from rest_server.tornado_database import  Connection
+if not len( mysql_username):
+    mysql_username, mysql_password='webworkWrite','webwork'
 
 if len(sys.argv)==1:
-    course = 'cse103'
+    course = u'CSE103'
 else:
     course=sys.argv[1]
 print 'writing descriptions of tables of course '+course +' in databaseDescription.md file...'     
@@ -81,18 +81,14 @@ def md_table(df,  padding=1, divider='|', header_div='-'):
 
 
 if __name__ == '__main__':
-    cnx = mysql.connector.connect(user= mysql_username, password=mysql_password,
-                              host='127.0.0.1',
-                              database='webwork')
-    cursor = cnx.cursor()
-    query = ("show tables;")
-    cursor.execute(query)
-    table_names=[r[0] for r in cursor if r[0][:len(course)]==course]
-    
+    conn = Connection('localhost','webwork',user=mysql_username,password=mysql_password)
+    result=conn.query("show tables")
+    table_names=[r for r in map(lambda x:x.values()[0], result) if r[:len(course)]==course]
     DB=[]
     for t in table_names:
-        cursor.execute("describe {};".format(t))
-        DB.append((t, pd.DataFrame([i for i in cursor], columns=['Field','Type', 'Null','Key','Default','Extra'])))
+        res= conn.query("describe {}".format(t))
+        DB.append((t, pd.DataFrame([j for j in res])[['Field','Type', 'Null','Key','Default','Extra']]))
     with open('./databaseDescription.md','w') as fileout:
         for i,(t,df) in enumerate(DB):
             print >> fileout, "### {}. {}\n***Description***:\n\n***Schema***:\n```\n{}\n```\n--------------------------------------------------".format(i+1,t,md_table(df)) 
+
