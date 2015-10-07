@@ -9,3 +9,6 @@ local_server/webwork.sql
 src/parsetrees/expr_parser/parser.out
 
 src/parsetrees/expr_parser/parsetab.py
+.project
+.pydevproject
+
