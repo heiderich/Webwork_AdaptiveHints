@@ -1,16 +1,21 @@
+#The functions  md_table and pad_to copied and modified from csvtomd, https://github.com/mplewis/csvtomd
 import sys,os
 sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__))+'/../servers'))
-from rest_server.webwork_config import mysql_username, mysql_password
 import pandas as pd
 import numpy as np
 from rest_server.tornado_database import  Connection
-if not len( mysql_username):
-    mysql_username, mysql_password='webworkWrite','webwork'
-
+print 'Usage:\ndescribe_tables.py mysql_username mysql_password [class_name (default=CSE103_Fall2015)]'
 if len(sys.argv)==1:
-    course = u'CSE103'
+    course = u'CSE103_Fall2015'
+    from rest_server.webwork_config import mysql_username, mysql_password
+elif len(sys.argv)==3:
+    course = u'CSE103_Fall2015'
+    mysql_username, mysql_password=sys.argv[1],sys.argv[2]
+elif len(sys.argv)==4:
+    mysql_username, mysql_password=sys.argv[1],sys.argv[2]
+    course=sys.argv[3]
 else:
-    course=sys.argv[1]
+    print 'Usage:\ndescribe_tables.py mysql_username mysql_password [class_name (default=CSE103_Fall2015)]'
 print 'writing descriptions of tables of course '+course +' in databaseDescription.md file...'     
 
 tables = []
