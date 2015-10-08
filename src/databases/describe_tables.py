@@ -4,6 +4,34 @@ sys.path.append(os.path.abspath(os.path.dirname(os.path.abspath(__file__))+'/../
 import pandas as pd
 import numpy as np
 from rest_server.tornado_database import  Connection
+
+table_descriptions={
+                   u'achievement' : 'description1',
+                   u'achievement_user' : 'description2', 
+                   u'answers_by_part' : 'description3', 
+                   u'assigned_hint' : 'description4', 
+                   u'assigned_hint_feedback' : 'description5', 
+                   u'assigned_hint_filter' : 'description6', 
+                   u'correct_answers' : 'description7', 
+                   u'global_user_achievement' : 'description8', 
+                   u'hint' : 'description9', 
+                   u'hint_filter' : 'description', 
+                   u'key' : 'description', 
+                   u'password' : 'description', 
+                   u'past_answer' : 'description', 
+                   u'permission' : 'description', 
+                   u'problem' : 'description', 
+                   u'problem_user' : 'description', 
+                   u'realtime_past_answer' : 'description', 
+                   u'set' : 'description', 
+                   u'set_locations' : 'description', 
+                   u'set_locations_user' : 'description', 
+                   u'set_user' : 'description', 
+                   u'setting' : 'description', 
+                   u'user' : 'description', 
+                   u'user_variables' : 'description'
+                   }
+
 print 'Usage:\ndescribe_tables.py mysql_username mysql_password [class_name (default=CSE103_Fall2015)]'
 if len(sys.argv)==1:
     course = u'CSE103_Fall2015'
@@ -38,9 +66,10 @@ def md_table(df,  padding=1, divider='|', header_div='-'):
     header_div: the horizontal divider to place between the header row and
         body cells
     """
-    df=df.astype('str')
+    if not df.shape[0]: return "This table is empty!"
+    df=df.applymap(lambda x : u'{}'.format(x))
     df.insert(0,'', map(str,df.index.values))
-    table= np.vstack((['', 'Field','Type', 'Null','Key','Default','Extra'],df.values))
+    table= np.vstack(( df.columns.values,df.values))
     # Output data buffer
     output = ''
     # Pad short rows to the length of the longest row to fix issues with
@@ -92,8 +121,10 @@ if __name__ == '__main__':
     DB=[]
     for t in table_names:
         res= conn.query("describe {}".format(t))
-        DB.append((t, pd.DataFrame([j for j in res])[['Field','Type', 'Null','Key','Default','Extra']]))
+	eg=conn.query("select * from {} limit 5".format(t))
+        DB.append((t, pd.DataFrame([j for j in res])[['Field','Type', 'Null','Key','Default','Extra']], pd.DataFrame([j for j in eg])))
     with open('./databaseDescription.md','w') as fileout:
-        for i,(t,df) in enumerate(DB):
-            print >> fileout, "### {}. {}\n***Description***:\n\n***Schema***:\n```\n{}\n```\n--------------------------------------------------".format(i+1,t,md_table(df)) 
+        for i,(t,df,eg) in enumerate(DB):
+            description= [v for k,v in table_descriptions.items() if t ==(course+'_'+k) ][0]
+            print >> fileout, (u'### {}. {}\n***Description***:\n\n{}\n\n***Schema***:\n```\n{}\n```\n***Example***:\n```\n{}\n```\n--------------------------------------------------'.format(i+1,t,description,md_table(df),md_table(eg))).encode("utf-8")
 
