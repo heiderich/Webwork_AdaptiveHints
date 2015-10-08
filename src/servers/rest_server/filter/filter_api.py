@@ -113,10 +113,10 @@ class FilterFunctions(ProcessQuery):
         #logger.debug(hint_id)
         now = datetime.now().isoformat()
         create_filter_function = ''' INSERT INTO filter_functions
-        (name, course, author, set_id, problem_id, code, created, updated, function_type)
-        values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{created}", "{updated}", "{function_type}");
+        (name, course, author, set_id, problem_id, code, dummy_hint_id, created, updated, function_type)
+        values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{hint_id}", "{created}", "{updated}", "{function_type}");
         '''.format(name=name, course=course, author=author, set_id=set_id,
-                   problem_id=problem_id, code=code, created=now,
+                   problem_id=problem_id, code=code, hint_id=0, created=now,
                    updated=now, function_type=function_type)
         #create_filter_function = ''' INSERT INTO filter_functions
         #(name, course, author, set_id, problem_id, dummy_hint_id, code, created, updated)
@@ -290,7 +290,7 @@ class ApplyFilterFunctions(ProcessQuery):
                 uni_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
             elif f[0] == "T":
                 time_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
-
+        
         txt = None
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
@@ -308,6 +308,7 @@ class ApplyFilterFunctions(ProcessQuery):
 
         # Send hint with 50% chance
         send = bool(random.getrandbits(1))
+
         # # create a temp file
         # temp = tempfile.NamedTemporaryFile(delete=False)
         # temp.write(txt)
