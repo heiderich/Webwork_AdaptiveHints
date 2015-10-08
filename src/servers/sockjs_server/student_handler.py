@@ -120,6 +120,8 @@ class StudentSockJSHandler(_BaseSockJSHandler):
 
                 logger.info("%s updated %s to %s"%(
                     ss.student_id, boxname, value))
+
+                self.send_hints_to_box(boxname, value)
             except:
                 logger.exception('Exception in student_answer handler')
 
@@ -280,7 +282,21 @@ class StudentSockJSHandler(_BaseSockJSHandler):
         """Send a list of hints to the client"""
         if not isinstance(hints, list):
             hints = [hints,]
+        logger.info("sending")
         self.send_message('hints', hints)
+
+    def send_hints_to_box(self, ans_box, ans_value):
+        """ Check filter functions
+        and apply the one that returns a non-empty hint """
+        part_id = int(ans_box.replace('AnSwEr',''))
+        ss = self.student_session
+        if ss is not None:
+            logger.info("Checking filter functions")
+            hint = ss._perform_run_filters(part_id, ans_value)
+            if hint['assigned'] and hint['hint_html'] != "":
+                self.send_hints(hint)
+
+
 
 
     def on_open(self, info):

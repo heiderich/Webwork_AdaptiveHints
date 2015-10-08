@@ -222,3 +222,24 @@ class StudentSession(object):
                           'recent_tries' : sum_recent_tries,
                           'time_lastincorrect' : time_lastincorrect,
                           'time_lasthint' : time_lasthint }
+    def _perform_run_filters(self, part_id, answer_string):
+        '''
+        Runs all assigned filter functions on the given student's answer.
+
+        If a filter returns True, render that hint and assign it to the student.
+        If a filter returns PGML text, render that instead, and assign it to the hint.
+
+        HintRestAPI.apply_hint_filters, HintRestAPI.render_html_assign_hint
+        '''
+        hint = HintRestAPI.apply_filter_functions(self.student_id, self.course_id, self.set_id,
+            self.problem_id, part_id, answer_string)
+        if hint['hint_html'] == "":
+            return hint
+        hint_html_template = HintRestAPI.render_html_assign_hint(self.student_id, self.course_id, self.set_id, self.problem_id,
+            0, 0, hint['hint_html'])
+        HintRestAPI.assign_hint(self.student_id, self.course_id, self.set_id, self.problem_id,
+            hint['location'], 0, hint['hint_html'], hint['assigned'])
+        return hint
+
+
+
