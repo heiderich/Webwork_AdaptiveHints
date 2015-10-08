@@ -10,8 +10,8 @@ from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
                      SetIds, Sets, Problems, ExportProblemData, AnswersByPart,
                      ProblemStatus, ProblemPartStatus, SetPsvn, AnswersByPartAllUsers)
 from hints_api import (AssignedHint, AssignedHintFilter,
-                       AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem)
-#                      UserProblemHints, Hint, ProblemHints, HintFeedback, RunHintFilters, HintFilter)
+                       AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem,
+                      UserProblemHints)#, Hint, ProblemHints, HintFeedback, HintFilter, RunHintFilters)
 from filter_api import (FilterFunctions, ApplyFilterFunctions, AssignedFilterFunctions)
 
 from auth import (Login)
@@ -57,20 +57,14 @@ if __name__ == "__main__":
         (r"/set_psvn", SetPsvn),
         (r"/pg_path", ProblemPGPath),
         (r"/pg_file", ProblemPGFile),
-        #(r"/user_problem_hints", UserProblemHints),
-        #(r"/hint", Hint),
         (r"/assigned_hint", AssignedHint),
         (r"/assigned_hint_history_by_hint_id", AssignedHintHistoryByHintID),
         (r"/assigned_hint_history_by_problem_part", AssignedHintHistoryByProblemPart),
         (r"/assigned_hint_history_of_problem", AssignedHintHistoryofProblem),
         (r"/assigned_hint_filter", AssignedHintFilter),
         (r"/realtime_user_problem_answers", RealtimeUserProblemAnswers),
-        #(r"/problem_hints", ProblemHints),
         (r"/realtime_problem_answer", RealtimeProblemAnswer),
-        #(r"/hint_feedback", HintFeedback),
-        #(r"/run_hint_filters", RunHintFilters),
         (r"/apply_filter_functions", ApplyFilterFunctions),
-        #(r"/hint_filter", HintFilter),
         (r"/set_ids", SetIds),
         (r"/sets", Sets),
         (r"/problems", Problems),
@@ -84,7 +78,13 @@ if __name__ == "__main__":
         (r"/filter_answers", FilterAnswers),
         (r"/filter_functions", FilterFunctions),
         (r"/assigned_filter_functions", AssignedFilterFunctions),
-        (r"/answers_by_part_all_users", AnswersByPartAllUsers)
+        (r"/answers_by_part_all_users", AnswersByPartAllUsers),
+        (r"/user_problem_hints", UserProblemHints)
+        #(r"/hint", Hint),
+        #(r"/problem_hints", ProblemHints),
+        #(r"/hint_feedback", HintFeedback),
+        #(r"/run_hint_filters", RunHintFilters),
+        #(r"/hint_filter", HintFilter)
     ], gzip=True, debug=True)
     # Start server
     application.listen(args.port, address=BIND_IP)

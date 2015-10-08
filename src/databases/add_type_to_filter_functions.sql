@@ -1,2 +1,2 @@
 ALTER TABLE filter_functions
-ADD type varchar(1);
+ADD function_type varchar(1);
