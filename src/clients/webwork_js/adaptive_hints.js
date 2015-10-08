@@ -98,16 +98,16 @@
     }
 
     /**
-     * Remove all the hints displayed currently
+     * Remove only hints displayed for the part
      */
-    function remove_all_hints() {
-		$('div[id^=wrapper_]').remove();
+    function remove_hints_for_part(partNumber) {
+		$('div[id^=wrapper_' + partNumber + ']').remove();
     }
 
     /**
      * Insrt a hint at the given location
      */
-    function insert_hint(hint_html, location, hintbox_id) {
+    function insert_hint(hint_html, location, hintbox_id, partNumber) {
 		var d = document.createElement('div');
 		d.setAttribute('id', 'wrapper_' + hintbox_id);
 		d.innerHTML = hint_html;
@@ -199,10 +199,11 @@
 				//  - Display the newly recieved hints
 				if (message['type'] == 'hints') {
 				    var hints = message['arguments'];
-				    remove_all_hints();
 				    for (var i=0; i < hints.length; i++) {
 						var hint = hints[i];
-						insert_hint(hint['hint_html'], hint['location'], hint['hintbox_id']);
+						var partNumber = parseInt(hint['location'].replace( /^\D+/g, ''));
+						remove_hints_for_part(partNumber);
+						insert_hint(hint['hint_html'], hint['location'], partNumber);
 				    }
 				}
 
