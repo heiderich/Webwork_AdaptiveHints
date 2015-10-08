@@ -427,7 +427,8 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         lineNumbers: true,
         mode: 'python',
 	    styleActiveLine: true,
-	    matchBrackets: true
+	    matchBrackets: true,
+        readOnly: 'nocursor'
     };
 
     $scope.populate_filter_function = function() {
@@ -445,7 +446,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         };
     }
 
-    $scope.populate_filter_function();
+    $scope.filter_function = {
+        code: "Please enter filter name and then click on Generate Filter Template to start writing filter functions."
+    }
 
     function group_filter_output(){
         $scope.filter_group = {};
@@ -539,6 +542,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.generate_filter_template = function() {
         var filter_type = $("#filter_function_type").val();
         $scope.filter_function_name = filter_type + "_" + $scope.set_id + "_" + $scope.problem_id + "_" + $scope.part_id + "_" + $("#filter_function_name").val();
+        $scope.editorOptions.readOnly = false;
         $scope.populate_filter_function();
     }
 
