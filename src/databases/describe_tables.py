@@ -121,8 +121,11 @@ if __name__ == '__main__':
     DB=[]
     for t in table_names:
         res= conn.query("describe {}".format(t))
-	eg=conn.query("select * from {} limit 5".format(t))
-        DB.append((t, pd.DataFrame([j for j in res])[['Field','Type', 'Null','Key','Default','Extra']], pd.DataFrame([j for j in eg])))
+	eg=conn.query("select * from {} limit 2000".format(t))
+	eg=pd.DataFrame([j for j in eg])
+	if eg.shape[0]>5:
+	    eg=eg.iloc[np.random.choice(eg.shape[0],5)]
+        DB.append((t, pd.DataFrame([j for j in res])[['Field','Type', 'Null','Key','Default','Extra']], eg))
     with open('./databaseDescription.md','w') as fileout:
         for i,(t,df,eg) in enumerate(DB):
             description= [v for k,v in table_descriptions.items() if t ==(course+'_'+k) ][0]

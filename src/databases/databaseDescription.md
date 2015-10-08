@@ -63,13 +63,13 @@ description3
 ```
 ***Example***:
 ```
-  | answer_id | answer_string | id | part_id | problem_id | score | set_id            | timestamp           | user_id 
---|-----------|---------------|----|---------|------------|-------|-------------------|---------------------|---------
-0 | 875       | F             | 1  | 1       | 1          | 1     | Intro.readingTest | 2013-09-28 22:56:36 | holi    
-1 | 875       | F             | 2  | 2       | 1          | 1     | Intro.readingTest | 2013-09-28 22:56:36 | holi    
-2 | 875       | T             | 3  | 3       | 1          | 1     | Intro.readingTest | 2013-09-28 22:56:36 | holi    
-3 | 875       | T             | 4  | 4       | 1          | 1     | Intro.readingTest | 2013-09-28 22:56:36 | holi    
-4 | 953       | F             | 5  | 1       | 1          | 1     | Intro.readingTest | 2013-09-28 23:39:34 | jacontre
+     | answer_id | answer_string | id   | part_id | problem_id | score | set_id      | timestamp           | user_id 
+-----|-----------|---------------|------|---------|------------|-------|-------------|---------------------|---------
+744  | 322       | D             | 745  | 4       | 14         | 1     | Orientation | 2013-09-28 00:07:07 | thk002  
+534  | 269       | B             | 535  | 3       | 13         | 1     | Orientation | 2013-09-27 23:52:42 | mabid   
+245  | 843       | 1             | 246  | 1       | 11         | 0     | Orientation | 2013-09-28 21:22:29 | whyao   
+1907 | 344       | cos(5x)       | 1908 | 1       | 8          | 1     | Orientation | 2013-09-28 00:24:05 | ercrawfo
+1358 | 154       | x^3           | 1359 | 1       | 5          | 1     | Orientation | 2013-09-27 21:26:20 | a5taylor
 ```
 --------------------------------------------------
 ### 4. CSE103_Fall2015_assigned_hint
@@ -152,13 +152,13 @@ description7
 ```
 ***Example***:
 ```
-  | answer        | part_id | problem_id | set_id | user_id 
---|---------------|---------|------------|--------|---------
-0 | {1,2,3,4,5,6} | 1       | 1          | Week2  | grecinto
-1 | {5,7,9,11}    | 2       | 1          | Week2  | grecinto
-2 | {1,2,3,4,5,6} | 1       | 1          | Week2  | rsamuail
-3 | {3,5,7,9}     | 2       | 1          | Week2  | rsamuail
-4 | {1,2,3,4,5,6} | 1       | 1          | Week2  | l5han   
+     | answer          | part_id | problem_id | set_id | user_id 
+-----|-----------------|---------|------------|--------|---------
+163  | {3,5,7,9,11,13} | 2       | 1          | Week2  | rshroyer
+1070 | {1}             | 2       | 2          | Week2  | nisharma
+1336 | {0}             | 1       | 2          | Week2  | xil109  
+1791 | {0,5}           | 1       | 3          | Week2  | wej001  
+1494 | {0,2,3}         | 3       | 2          | Week2  | nhn018  
 ```
 --------------------------------------------------
 ### 8. CSE103_Fall2015_global_user_achievement
@@ -179,16 +179,15 @@ description8
 ```
 ***Example***:
 ```
-  | achievement_points | facebooker | frozen_hash                                        | level_achievement_id | next_level_points | user_id 
---|--------------------|------------|----------------------------------------------------|----------------------|-------------------|---------
-0 | 15                 | None       |    ƒ   completeProblems                      | None                 | None              | yfreund 
-1 | 665                | None       |       completeSets
-133   completeProblems | None                 | None              | dleroy  
-2 | 1045               | None       |    ’   completeSets
-209   completeProblems | None                 | None              | halou   
-3 | 940                | None       |    ˜   completeSets
-188   completeProblems | None                 | None              | jagustin
-4 | 340                | None       |    †   completeSetsÄ   completeProblems    | None                 | None              | r1luong 
+    | achievement_points | facebooker | frozen_hash                                        | level_achievement_id | next_level_points | user_id 
+----|--------------------|------------|----------------------------------------------------|----------------------|-------------------|---------
+380 | 170                | None       | 	   ‚   completeSets¢   completeProblems    | None                 | None              | ksmurlo 
+68  | 870                | None       |    –   completeSets
+174   completeProblems | None                 | None              | cjy008  
+174 | 70                 | None       |       completeSetsŽ   completeProblems    | None                 | None              | amahrous
+210 | 170                | None       | 	   ¢   completeProblems‚   completeSets    | None                 | None              | asetters
+54  | 1010               | None       |    —   completeSets
+202   completeProblems | None                 | None              | kegu    
 ```
 --------------------------------------------------
 ### 9. CSE103_Fall2015_hint
@@ -249,13 +248,13 @@ description
 ```
 ***Example***:
 ```
-  | key_not_a_keyword                | timestamp  | user_id 
---|----------------------------------|------------|---------
-0 | FymoYXr0nuqGtcKtzZ2QI8hNem6v9syU | 1443996953 | yfreund 
-1 | eNPdqxvLPvz1HH2jXDbWwMGockVGrrae | 1444266528 | rsmurlo 
-2 | 4Grl9TpcjUnd09bC9H3E3hwRGs9Ezl9G | 1443907776 | dpereira
-3 | Cgujw6ruJfPLucXa64aKXKXjBDRDEj3T | 1443741191 | aysee   
-4 | 32LBT3QgyWxu7wFtPy63wGZUz2VKupK3 | 1386616595 | dhyee   
+    | key_not_a_keyword                | timestamp  | user_id 
+----|----------------------------------|------------|---------
+261 | sD72tD36PD7g8bbNpHQ9L7cv6Ufc6vbN | 1443903520 | jic212  
+99  | Gh97lTCJnKCTMxjcLhJibCImi5npWDlF | 1386613397 | calmajos
+442 | LiILSh5NnlH3v6kepS8lGNDSZERZ5AQC | 1444076763 | aordookh
+413 | VwSK0U5kQoO2MqPnVVnES0oklyMrXHIG | 1443996018 | csl030  
+200 | F7tLNUyJkthCQoSc2I1TWOSg7iyR7NO3 | 1386379987 | fake    
 ```
 --------------------------------------------------
 ### 12. CSE103_Fall2015_password
@@ -272,13 +271,13 @@ description
 ```
 ***Example***:
 ```
-  | password                                                                                                   | user_id
---|------------------------------------------------------------------------------------------------------------|--------
-0 | $6$.yjkiJBBHNgLc9Z5$v1KkA6W7Ty7sPHGqK87GnAEjzG5N84NVy40bIsyR0Zzi6AGgZq4d4.MDEmukvgiC/u1A8Sd.GaDDiyQMRe15p0 | sayao  
-1 | LTtaaDBCqZ7Nc                                                                                              | yfreund
-2 | $6$EZj4.ds2DzBZQv.R$/mJAcw5vfrJQtTdECBEvwfoWVSU3KG0EB88kNZSNuQB6Tdd9Dn5tazloDFSDmLN5dBRfmsNi4f.wC3oXtBe5o1 | muy002 
-3 | 2.9r9vM8BjCl2                                                                                              | mabid  
-4 | J0axR3nY/P.xg                                                                                              | babney 
+    | password                                                                                                   | user_id 
+----|------------------------------------------------------------------------------------------------------------|---------
+542 | $6$5I43PTztqU8NRVVy$GJM964XK2ZHkpx6QEJIvIiC0xJXjatXZ6AD4EeS7OPct4sQF0yx0lQBy6q5bdY9w0Fxre01NBRq5GrBrm9.O3/ | xiw230  
+193 | KDhs6iY3dpHR6                                                                                              | rvillanu
+415 | $6$.SjiMFGIqBTACK9f$K3BI4stlz9aUCaC.2SSUBsB.KQOsyzyo2.MBvPbO.xmx0p1ej33EHUMTcTE3wzcTsZnLXvlHY1s7yCbclhoeo/ | dis003  
+474 | $6$PjkOyqiuudUu2eH0$cuaZrk/QsRExqSwJhi6u05Uiw6tj6r8mC7Tan3sneKZLSCqwxan8F1HkdC87e5iVx6pw5I9y8/YLrDBO/qMQ00 | rloza   
+67  | Uhnzi4DAyBlq.                                                                                              | d8kwon  
 ```
 --------------------------------------------------
 ### 13. CSE103_Fall2015_past_answer
@@ -303,13 +302,13 @@ description
 ```
 ***Example***:
 ```
-  | answer_id | answer_string | comment_string | course_id   | problem_id | scores | set_id                | source_file                                  | timestamp  | user_id
---|-----------|---------------|----------------|-------------|------------|--------|-----------------------|----------------------------------------------|------------|--------
-0 | 1         | 123	          | None           | UCSD_CSE103 | 2          | 0      | TestPreparationCB     | setTestPreparation/events8_hint.pg           | 1371175363 | wentao 
-1 | 2         | 2	3	4	        | None           | UCSD_CSE103 | 4          | 000    | TestPreparationCB     | setTestPreparation/cond6_hint.pg             | 1371175400 | wentao 
-2 | 3         | 2	3	          | None           | UCSD_CSE103 | 4          | 11     | Statistics_appetizers | local/setStatistics_appetizers/ThreeCards.pg | 1379190808 | yfreund
-3 | 4         | None          | None           | UCSD_CSE103 | 1          | None   | Orientation           | setOrientation/prob01.pg                     | 1380312884 | dleroy 
-4 | 5         | None          | None           | UCSD_CSE103 | 2          | None   | Orientation           | setOrientation/prob02.pg                     | 1380313058 | dleroy 
+    | answer_id | answer_string                                              | comment_string | course_id   | problem_id | scores  | set_id      | source_file              | timestamp  | user_id 
+----|-----------|------------------------------------------------------------|----------------|-------------|------------|---------|-------------|--------------------------|------------|---------
+32  | 33        | cos(pi)	1/tan(x)	arcsin(t+1)	[sin(x)-cos(x)]/[sqrt(2x-7)]	 | None           | UCSD_CSE103 | 7          | 1111    | Orientation | setOrientation/prob07.pg | 1380315811 | jagustin
+774 | 775       | -11	7+9	18-2	32/2	4*4	8*2	4(30-5)	                         | None           | UCSD_CSE103 | 3          | 1111111 | Orientation | setOrientation/prob03.pg | 1380395569 | rqiu    
+921 | 922       | cos5x				                                                  | None           | UCSD_CSE103 | 8          | 0000    | Orientation | setOrientation/prob08.pg | 1380410862 | holi    
+473 | 474       | 32	0.67	20	65	128	                                         | None           | UCSD_CSE103 | 4          | 10111   | Orientation | setOrientation/prob04.pg | 1380344979 | tiw005  
+614 | 615       | (-1,0)	<-3,1,-5>	<-1,4,2> + <0,2,1>	                       | None           | UCSD_CSE103 | 10         | 111     | Orientation | setOrientation/prob10.pg | 1380360034 | dnl001  
 ```
 --------------------------------------------------
 ### 14. CSE103_Fall2015_permission
@@ -326,13 +325,13 @@ description
 ```
 ***Example***:
 ```
-  | permission | user_id 
---|------------|---------
-0 | 0          | flhernan
-1 | 0          | atorr   
-2 | 0          | krkelkar
-3 | 10         | yfreund 
-4 | 0          | z3meng  
+    | permission | user_id 
+----|------------|---------
+222 | 0          | hmangalo
+22  | 0          | rchaloux
+257 | 0          | masaro  
+4   | 0          | z3meng  
+511 | 0          | megoel  
 ```
 --------------------------------------------------
 ### 15. CSE103_Fall2015_problem
@@ -355,13 +354,13 @@ description
 ```
 ***Example***:
 ```
-  | flags | max_attempts | problem_id | set_id        | showMeAnother | showMeAnotherCount | source_file                            | value
---|-------|--------------|------------|---------------|---------------|--------------------|----------------------------------------|------
-0 | None  | -1           | 6          | Week1         | None          | None               | Reorganized/Orientation/prob06.pg      | 1    
-1 | None  | -1           | 5          | Week1         | None          | None               | Reorganized/Orientation/prob05.pg      | 1    
-2 | None  | -1           | 4          | Week1         | None          | None               | Reorganized/Orientation/prob04.pg      | 1    
-3 | None  | -1           | 3          | Week1         | None          | None               | Reorganized/Orientation/prob03.pg      | 1    
-4 | None  | -1           | 6          | BasicExamples | None          | None               | local/setBasicExamples/event_tree_6.pg | 1    
+    | flags | max_attempts | problem_id | set_id         | showMeAnother | showMeAnotherCount | source_file                                                  | value
+----|-------|--------------|------------|----------------|---------------|--------------------|--------------------------------------------------------------|------
+13  | None  | -1           | 2          | Week5          | nan           | nan                | Reorganized/ConditionalProbability/ConditionalProbability.pg | 1    
+10  | None  | -1           | 3          | BasicExamples  | nan           | nan                | local/setBasicExamples/event_tree_3.pg                       | 1    
+116 | None  | -1           | 39         | UnusedProblems | nan           | nan                | Reorganized/ExpectationVariance/Notes3_5_3.pg                | 1    
+118 | None  | -1           | 41         | UnusedProblems | nan           | nan                | Reorganized/Covariance/ContingencyTables7.pg                 | 1    
+255 | None  | -1           | 19         | Week1          | nan           | nan                | Reorganized/EventSpace/event_tree_4.pg                       | 1    
 ```
 --------------------------------------------------
 ### 16. CSE103_Fall2015_problem_user
@@ -392,13 +391,13 @@ description
 ```
 ***Example***:
 ```
-  | attempted | flags | last_answer | max_attempts | num_correct | num_incorrect | problem_id | problem_seed | set_id | showMeAnother | showMeAnotherCount | source_file | status | sub_status | user_id  | value
---|-----------|-------|-------------|--------------|-------------|---------------|------------|--------------|--------|---------------|--------------------|-------------|--------|------------|----------|------
-0 | 0         | None  | None        | None         | 0           | 0             | 14         | 1839         | Week1  | None          | None               | None        | 0.0    | 0.0        | bbarmeye | None 
-1 | 0         | None  | None        | None         | 0           | 0             | 1          | 118          | Week1  | None          | None               | None        | 0.0    | 0.0        | bbatenga | None 
-2 | 0         | None  | None        | None         | 0           | 0             | 13         | 3935         | Week1  | None          | None               | None        | 0.0    | 0.0        | bbarmeye | None 
-3 | 0         | None  | None        | None         | 0           | 0             | 5          | 2737         | Week1  | None          | None               | None        | 0.0    | 0.0        | bbarmeye | None 
-4 | 0         | None  | None        | None         | 0           | 0             | 7          | 3517         | Week1  | None          | None               | None        | 0.0    | 0.0        | dabaraja | None 
+     | attempted | flags | last_answer | max_attempts | num_correct | num_incorrect | problem_id | problem_seed | set_id         | showMeAnother | showMeAnotherCount | source_file | status | sub_status | user_id   | value
+-----|-----------|-------|-------------|--------------|-------------|---------------|------------|--------------|----------------|---------------|--------------------|-------------|--------|------------|-----------|------
+843  | 0         | None  | None        | None         | 0           | 0             | 5          | 2211         | Week1          | None          | None               | None        | 0.0    | 0.0        | ajudah    | None 
+443  | 0         | None  | None        | None         | 0           | 0             | 7          | 2724         | Week1          | None          | None               | None        | 0.0    | 0.0        | rmaloney  | None 
+777  | 0         | None  | None        | None         | 0           | 0             | 15         | 2509         | Week1          | None          | None               | None        | 0.0    | 0.0        | jal180    | None 
+1681 | 0         | None  | None        | None         | 0           | 0             | 10         | 1332         | UnusedProblems | None          | None               | None        | 0.0    | 0.0        | pg_render | None 
+267  | 0         | None  | None        | None         | 0           | 0             | 5          | 2073         | Week1          | None          | None               | None        | 0.0    | 0.0        | jbkong    | None 
 ```
 --------------------------------------------------
 ### 17. CSE103_Fall2015_realtime_past_answer
@@ -466,13 +465,13 @@ description
 ```
 ***Example***:
 ```
-  | answer_date | assignment_type | attempts_per_version | description | due_date   | enable_reduced_scoring | hardcopy_header | hide_hint | hide_score | hide_score_by_problem | hide_work | open_date  | problem_randorder | problems_per_page | reduced_scoring_date | relax_restrict_ip | restrict_ip | restricted_login_proctor | restricted_release | restricted_status | set_header    | set_id        | time_interval | time_limit_cap | version_creation_time | version_last_attempt_time | version_time_limit | versions_per_interval | visible
---|-------------|-----------------|----------------------|-------------|------------|------------------------|-----------------|-----------|------------|-----------------------|-----------|------------|-------------------|-------------------|----------------------|-------------------|-------------|--------------------------|--------------------|-------------------|---------------|---------------|---------------|----------------|-----------------------|---------------------------|--------------------|-----------------------|--------
-0 | 1409781840  | default         | None                 | None        | 1409781840 | 0                      | defaultHeader   | None      | None       | None                  | None      | 1409177040 | None              | 0.0               | None                 | No                | No          | None                     | None               | None              | defaultHeader | BasicExamples | None          | None           | None                  | None                      | None               | 0.0                   | 1      
-1 | 1443744000  | default         | None                 | None        | 1443744000 | 1                      | defaultHeader   | None      | None       | None                  | None      | 1443139200 | None              | 0.0               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week1         | None          | None           | None                  | None                      | None               | 0.0                   | 1      
-2 | 1448586000  | default         | None                 | None        | 1448586000 | 0                      | defaultHeader   | None      | None       | None                  | None      | 1447981200 | None              | 0.0               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week9         | None          | None           | None                  | None                      | None               | 0.0                   | 1      
-3 | 1418241600  | None            | None                 | None        | 1418241600 | 1                      | defaultHeader   | None      | N          | None                  | N         | 1417636800 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | FinalPractice | None          | 0              | None                  | None                      | None               | nan                   | 1      
-4 | 1449190800  | None            | None                 | None        | 1449190800 | 1                      | defaultHeader   | None      | N          | None                  | N         | 1448586000 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week10        | None          | 0              | None                  | None                      | None               | nan                   | 1      
+   | answer_date | assignment_type | attempts_per_version | description | due_date   | enable_reduced_scoring | hardcopy_header | hide_hint | hide_score | hide_score_by_problem | hide_work | open_date  | problem_randorder | problems_per_page | reduced_scoring_date | relax_restrict_ip | restrict_ip | restricted_login_proctor | restricted_release | restricted_status | set_header    | set_id         | time_interval | time_limit_cap | version_creation_time | version_last_attempt_time | version_time_limit | versions_per_interval | visible
+---|-------------|-----------------|----------------------|-------------|------------|------------------------|-----------------|-----------|------------|-----------------------|-----------|------------|-------------------|-------------------|----------------------|-------------------|-------------|--------------------------|--------------------|-------------------|---------------|----------------|---------------|----------------|-----------------------|---------------------------|--------------------|-----------------------|--------
+15 | 1419912000  | None            | None                 | None        | 1419912000 | 1                      | defaultHeader   | None      | N          | None                  | N         | 1419112380 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | UnusedProblems | None          | 0              | None                  | None                      | None               | nan                   | 1      
+4  | 1449190800  | None            | None                 | None        | 1449190800 | 1                      | defaultHeader   | None      | N          | None                  | N         | 1448586000 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week10         | None          | 0              | None                  | None                      | None               | nan                   | 1      
+14 | 1446771600  | None            | None                 | None        | 1446771600 | 0                      | defaultHeader   | None      | N          | None                  | N         | 1446166800 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week6          | None          | 0              | None                  | None                      | None               | nan                   | 1      
+2  | 1448586000  | default         | None                 | None        | 1448586000 | 0                      | defaultHeader   | None      | None       | None                  | None      | 1447981200 | None              | 0.0               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week9          | None          | None           | None                  | None                      | None               | 0.0                   | 1      
+14 | 1446771600  | None            | None                 | None        | 1446771600 | 0                      | defaultHeader   | None      | N          | None                  | N         | 1446166800 | None              | nan               | None                 | No                | No          | None                     | None               | None              | defaultHeader | Week6          | None          | 0              | None                  | None                      | None               | nan                   | 1      
 ```
 --------------------------------------------------
 ### 19. CSE103_Fall2015_set_locations
@@ -553,13 +552,13 @@ description
 ```
 ***Example***:
 ```
-  | answer_date | assignment_type | attempts_per_version | description | due_date | enable_reduced_scoring | hardcopy_header | hide_hint | hide_score | hide_score_by_problem | hide_work | open_date | problem_randorder | problems_per_page | psvn  | reduced_scoring_date | relax_restrict_ip | restrict_ip | restricted_login_proctor | restricted_release | restricted_status | set_header | set_id | time_interval | time_limit_cap | user_id  | version_creation_time | version_last_attempt_time | version_time_limit | versions_per_interval | visible
---|-------------|-----------------|----------------------|-------------|----------|------------------------|-----------------|-----------|------------|-----------------------|-----------|-----------|-------------------|-------------------|-------|----------------------|-------------------|-------------|--------------------------|--------------------|-------------------|------------|--------|---------------|----------------|----------|-----------------------|---------------------------|--------------------|-----------------------|--------
-0 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 8390  | None                 | None              | None        | None                     | None               | None              | None       | Week1  | None          | None           | ybowen   | None                  | None                      | None               | None                  | None   
-1 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 29896 | None                 | None              | None        | None                     | None               | None              | None       | Week10 | None          | None           | yeh013   | None                  | None                      | None               | None                  | None   
-2 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 8388  | None                 | None              | None        | None                     | None               | None              | None       | Week1  | None          | None           | bbatra   | None                  | None                      | None               | None                  | None   
-3 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 8387  | None                 | None              | None        | None                     | None               | None              | None       | Week1  | None          | None           | bbatenga | None                  | None                      | None               | None                  | None   
-4 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 8386  | None                 | None              | None        | None                     | None               | None              | None       | Week1  | None          | None           | bbarmeye | None                  | None                      | None               | None                  | None   
+     | answer_date | assignment_type | attempts_per_version | description | due_date | enable_reduced_scoring | hardcopy_header | hide_hint | hide_score | hide_score_by_problem | hide_work | open_date | problem_randorder | problems_per_page | psvn  | reduced_scoring_date | relax_restrict_ip | restrict_ip | restricted_login_proctor | restricted_release | restricted_status | set_header | set_id | time_interval | time_limit_cap | user_id  | version_creation_time | version_last_attempt_time | version_time_limit | versions_per_interval | visible
+-----|-------------|-----------------|----------------------|-------------|----------|------------------------|-----------------|-----------|------------|-----------------------|-----------|-----------|-------------------|-------------------|-------|----------------------|-------------------|-------------|--------------------------|--------------------|-------------------|------------|--------|---------------|----------------|----------|-----------------------|---------------------------|--------------------|-----------------------|--------
+1273 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 29770 | None                 | None              | None        | None                     | None               | None              | None       | Week10 | None          | None           | tak068   | None                  | None                      | None               | None                  | None   
+851  | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 29876 | None                 | None              | None        | None                     | None               | None              | None       | Week10 | None          | None           | vinaraya | None                  | None                      | None               | None                  | None   
+1664 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 27570 | None                 | None              | None        | None                     | None               | None              | None       | Week3  | None          | None           | ralhadda | None                  | None                      | None               | None                  | None   
+1056 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 28793 | None                 | None              | None        | None                     | None               | None              | None       | Week7  | None          | None           | hkhodada | None                  | None                      | None               | None                  | None   
+1844 | None        | None            | None                 | None        | None     | None                   | None            | None      | None       | None                  | None      | None      | None              | None              | 27516 | None                 | None              | None        | None                     | None               | None              | None       | Week3  | None          | None           | kgrozav  | None                  | None                      | None               | None                  | None   
 ```
 --------------------------------------------------
 ### 22. CSE103_Fall2015_setting
@@ -605,13 +604,13 @@ description
 ```
 ***Example***:
 ```
-  | comment | displayMode | email_address    | first_name   | last_name | recitation | section | showOldAnswers | status | student_id | useMathView | user_id
---|---------|-------------|------------------|--------------|-----------|------------|---------|----------------|--------|------------|-------------|--------
-0 | None    | MathJax     | c4du@ucsd.edu    | Chongyang    | Du        | None       | 849807  | 1.0            | C      | A91117207  | None        | c4du   
-1 | None    | None        | kew060@ucsd.edu  | Kevin        | Wong      | None       | 849807  | nan            | C      | A12319704  | None        | kew060 
-2 | None    | None        | kmphan@ucsd.edu  | Khoi Minh    | Phan      | None       | 849807  | nan            | C      | A12291728  | None        | kmphan 
-3 | None    | None        | yfreund@ucsd.edu | Yoav         | Freund    | None       | None    | nan            | C      | yfreund    | None        | yfreund
-4 | None    | None        | krau@ucsd.edu    | Kristopher B | Rau       | None       | 849807  | nan            | C      | A11965837  | None        | krau   
+    | comment | displayMode | email_address     | first_name   | last_name | recitation | section | showOldAnswers | status | student_id | useMathView | user_id 
+----|---------|-------------|-------------------|--------------|-----------|------------|---------|----------------|--------|------------|-------------|---------
+5   | None    | MathJax     | aalhaida@ucsd.edu | Amal         | Alhaidari | None       | 849807  | 1.0            | C      | A98069538  | None        | aalhaida
+246 | None    | None        | edcole@ucsd.edu   | Erin Dorothy | Cole      | None       | 849807  | nan            | C      | A11858829  | None        | edcole  
+201 | None    | None        | ajabasa@ucsd.edu  | Andrew Mazon | Jabasa    | None       | 849807  | nan            | C      | A11479202  | None        | ajabasa 
+172 | None    | MathJax     | tol003@ucsd.edu   | Tong         | Lee       | None       | 849807  | 1.0            | C      | A12380292  | None        | tol003  
+61  | None    | MathJax     | lywong@ucsd.edu   | Lok Yi       | Wong      | None       | 849807  | 1.0            | C      | A10659556  | None        | lywong  
 ```
 --------------------------------------------------
 ### 24. CSE103_Fall2015_user_variables
@@ -632,12 +631,12 @@ description
 ```
 ***Example***:
 ```
-  | name | problem_id | set_id | string                 | user_id  | value
---|------|------------|--------|------------------------|----------|------
-0 | $Ac  | 1          | Week2  | {1,2,3,4,5,6}          | grecinto | 0.0  
-1 | $rs  | 1          | Week2  | {4,5,6,7,8,9,10,11,12} | grecinto | 0.0  
-2 | $A   | 1          | Week2  | {5,7,9,11}             | grecinto | 0.0  
-3 | $min | 1          | Week2  | 4                      | grecinto | 4.0  
-4 | $max | 1          | Week2  | 12                     | grecinto | 12.0 
+     | name | problem_id | set_id | string          | user_id  | value
+-----|------|------------|--------|-----------------|----------|------
+1776 | $Ac  | 1          | Week2  | {1,2,3,4,5,6}   | lmfink   | 0.0  
+658  | $max | 1          | Week2  | 15              | kdb006   | 15.0 
+1429 | $rs  | 1          | Week2  | {6,7,8,9,10,11} | cagatep  | 0.0  
+717  | $min | 1          | Week2  | 4               | rbdoming | 4.0  
+1252 | $max | 1          | Week2  | 13              | krkelkar | 13.0 
 ```
 --------------------------------------------------
