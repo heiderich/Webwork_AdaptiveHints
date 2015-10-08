@@ -12,6 +12,26 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     var part_id = $scope.part_id = $stateParams.part_id;
     var part_value = "AnSwEr"+("0000"+part_id).slice(-4);
     var user_id = $scope.user_id = Session.user_id;
+
+    $scope.noOfPartsSoFar = [];
+    for (var i=1; i<=$scope.part_id; i++) {
+        $scope.noOfPartsSoFar.push("Part"+i);
+    }
+
+    $scope.dtOptions1 = {
+        bDestroy: true,
+        iDisplayLength: 10,
+        integrateBootstrap: true
+    }
+
+    $scope.dtOptions2 = {
+        bDestroy: true,
+        iDisplayLength: 10,
+        integrateBootstrap: true
+    }
+
+    //$scope.filter_functions = [];
+    
     $scope.hint_id = -1;
     $scope.input_id = null;
     $scope.linked_hint = null;
@@ -23,6 +43,8 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.hints = [];
     $scope.filtered_students = [];
     $scope.filtered_groups = [];
+
+    $scope.filter_function_name = "answer_filter";
 
     $scope.user_webwork_url = 'http://'+APIHost+'/webwork2/'+course+'/'+set_id+
         '/'+problem_id+'/?user='+user_id_for_problem_render+'&passwd='+password_for_problem_render+'&effectiveUser='+user_id;
@@ -37,6 +59,35 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 answersByPart[value.part_id].push(value);
             });
             $scope.answers = answersByPart[part_id];
+    });
+
+
+    WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
+        success(function(data){
+            $("#attempts_table").DataTable().destroy();  
+            $scope.answersByPartAllUsers = {};
+            var temporaryMap = {};
+            var temporaryMap2 = {};
+            angular.forEach(data, function(value){
+                if (value.part_id <= $scope.part_id) {
+                    if (!temporaryMap[value.user_id]) {
+                       temporaryMap[value.user_id] = {};
+                    }
+                    temporaryMap[value.user_id][value.part_id] = value;
+                }
+            });
+            angular.forEach(temporaryMap, function(value) {
+                var curr_user_id = value["1"].user_id;
+                if (!$scope.answersByPartAllUsers[curr_user_id]) {
+                    $scope.answersByPartAllUsers[curr_user_id] = {};
+                }
+                $scope.answersByPartAllUsers[curr_user_id].user_id = curr_user_id;
+                for (var i=1; i<=$scope.noOfPartsSoFar.length;i++) {
+                    if (value[i]) {
+                        $scope.answersByPartAllUsers[curr_user_id]["Part"+i] = value[i].answer_string;
+                    }
+                }
+            });
     });
 
     /*WebworkService.groupedPartAnswers(course, set_id, problem_id, part_id).success(function(data){
@@ -376,18 +427,28 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         lineNumbers: true,
         mode: 'python',
 	    styleActiveLine: true,
-	    matchBrackets: true
+	    matchBrackets: true,
+        readOnly: 'nocursor'
     };
 
+    $scope.populate_filter_function = function() {
+        $scope.filter_function = {
+            code: "def " + $scope.filter_function_name + "(params):\n  "
+                + '"""' + " Written by " + user_id + " " + new Date() + "\n  "
+                + "<Filter Description goes here>\n  "
+                + '"""\n  '
+                + "# params = {'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []} \n"
+                + "  import json\n  print json.dumps(params)\n  return False",
+            author: Session.user_id,
+            course: course,
+            dirty: true,
+            name: null
+        };
+    }
+
     $scope.filter_function = {
-        code: "def answer_filter(params):\n  "
-            + "# params = [answer_string, parse_tree, eval_tree, correct_string, correct_tree, correct_eval, user_vars] \n"
-            + "  import json\n  print json.dumps(params)\n  return False",
-        author: Session.user_id,
-        course: course,
-        dirty: true,
-        name: null
-    };
+        code: "Please enter filter name and then click on Generate Filter Template to start writing filter functions."
+    }
 
     function group_filter_output(){
         $scope.filter_group = {};
@@ -458,8 +519,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     $scope.save_filter = function(event){
         var ff = $scope.filter_function;
+        ff.name = ff.code.substring(4,ff.code.indexOf('('));
         console.log(ff);
-        if(!ff.id){
+        //if(!ff.id){
             HintsService.createFilterFunction(
                 ff.name, ff.course, ff.author, ff.code,
                 ff.set_id, ff.problem_id).success(function(new_ff_id){
@@ -467,20 +529,27 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                     loadfilters();
                 });
 
-        }else{
+        /*}else{
             console.log(ff.id);
             HintsService.updateFilterFunction(
                 ff.id, ff.code).success(function(){
                     loadfilters();
                 });
-        }
+        }*/
         ff.dirty = false;
     };
+
+    $scope.generate_filter_template = function() {
+        var filter_type = $("#filter_function_type").val();
+        $scope.filter_function_name = filter_type + "_" + $scope.set_id + "_" + $scope.problem_id + "_" + $scope.part_id + "_" + $("#filter_function_name").val();
+        $scope.editorOptions.readOnly = false;
+        $scope.populate_filter_function();
+    }
 
     $scope.load_filter = function(){
         HintsService.getFilterFunctions({name: $scope.filter_function.name}).
             success(function(data){
-                $scope.filter_function = data[0];
+                $scope.filter_function = data;//[0];
                 $scope.filter_function.dirty = false;
             });
     };
@@ -552,4 +621,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     window.setTimeout(function() {
         $scope.openProblemPageInIFrame();
     }, 250);
+
+    $scope.show_filter_code = function(filter_code) {
+        $("#filter_code_read_only_container").removeClass("hidden");
+        $("#filter_code_read_only").html(filter_code);
+    }
 });

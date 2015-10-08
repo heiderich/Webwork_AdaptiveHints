@@ -1,6 +1,12 @@
 .. _architecture:
 
 =============
+Architecture Block Diagram
+=============
+
+![architecture block diagram](https://www.lucidchart.com/publicSegments/view/830486c1-1dfb-4193-9f85-e66665dcd1db/image.png  "diagram")
+
+=============
 Architecture Overview
 =============
 

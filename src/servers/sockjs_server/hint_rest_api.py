@@ -126,11 +126,11 @@ class HintRestAPI(object):
 
     @staticmethod
     def assign_hint(student_id, course_id, set_id,
-                    problem_id, location, hint_id, hint_html_template):
+                    problem_id, location, hint_id, hint_html_template, assigned):
         base_url = HintRestAPI._baseurl
         params = {'user_id':student_id, 'course':course_id,
                   'set_id':set_id, 'problem_id':problem_id, 'pg_id':location,
-                  'hint_id':hint_id, 'hint_html_template':hint_html_template}
+                  'hint_id':hint_id, 'hint_html_template':hint_html_template, 'assigned':assigned}
         r = requests.post(base_url+'/assigned_hint', data=params)
 
     @staticmethod
@@ -225,9 +225,9 @@ class HintRestAPI(object):
         pg_id = 'AnSwEr{part:04d}'.format(part=part_id)
         logger.debug(pg_id)
         # Assign hints that pass some filter
-        for hint_id, pgml in hints.iteritems():
-            HintRestAPI.render_html_assign_hint(user_id, course, set_id,
-                                                problem_id, pg_id, hint_id, pgml)
+        #for hint_id, pgml in hints.iteritems():
+        #    HintRestAPI.render_html_assign_hint(user_id, course, set_id,
+        #                                        problem_id, pg_id, hint_id, pgml)
         return hints
 
     @staticmethod
@@ -240,11 +240,12 @@ class HintRestAPI(object):
             assign_hint API '''
         base_url = HintRestAPI._baseurl
         # GET /hint
-        r = requests.get(base_url+'/hint', params={'course':course,  'hint_id':hint_id}).json()
+        #r = requests.get(base_url+'/hint', params={'course':course,  'hint_id':hint_id}).json()
         if hint_PGML:
-            pg_text = '%s\n%s\n%s'%(r['pg_header'], hint_PGML, r['pg_footer'])
-        else:
-            pg_text = '%s\n%s\n%s'%(r['pg_header'], r['pg_text'], r['pg_footer'])
+            pg_text = '%s\n%s\n%s'%('DOCUMENT();', hint_PGML, 'ENDDOCUMENT();')
+            #pg_text = '%s\n%s\n%s'%(r['pg_header'], hint_PGML, r['pg_footer'])
+        #else:
+            #pg_text = '%s\n%s\n%s'%(r['pg_header'], r['pg_text'], r['pg_footer'])
         # GET /problem_seed
         seed = requests.get(base_url+'/problem_seed', params={'course':course,
             'set_id':set_id, 'problem_id': problem_id, 'user_id':user_id}).json()

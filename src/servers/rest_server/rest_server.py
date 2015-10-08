@@ -8,13 +8,11 @@ from checkanswer import CheckAnswer
 from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
                      RealtimeUserProblemAnswers, RealtimeProblemAnswer,
                      SetIds, Sets, Problems, ExportProblemData, AnswersByPart,
-                     ProblemStatus, ProblemPartStatus, SetPsvn)
-from hints_api import (UserProblemHints, Hint, AssignedHint,
-                       ProblemHints, HintFeedback, RunHintFilters,
-                       HintFilter, AssignedHintFilter,
-                       AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem)
-from filter_api import (FilterFunctions, ApplyFilterFunctions,
-                        AssignedFilterFunctions)
+                     ProblemStatus, ProblemPartStatus, SetPsvn, AnswersByPartAllUsers)
+from hints_api import (AssignedHint, AssignedHintFilter,
+                       AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem,
+                      UserProblemHints)#, Hint, ProblemHints, HintFeedback, HintFilter, RunHintFilters)
+from filter_api import (FilterFunctions, ApplyFilterFunctions, AssignedFilterFunctions)
 
 from auth import (Login)
 from parsers import ParseString, GroupedPartAnswers, FilterAnswers
@@ -59,20 +57,14 @@ if __name__ == "__main__":
         (r"/set_psvn", SetPsvn),
         (r"/pg_path", ProblemPGPath),
         (r"/pg_file", ProblemPGFile),
-        (r"/user_problem_hints", UserProblemHints),
-        (r"/hint", Hint),
         (r"/assigned_hint", AssignedHint),
         (r"/assigned_hint_history_by_hint_id", AssignedHintHistoryByHintID),
         (r"/assigned_hint_history_by_problem_part", AssignedHintHistoryByProblemPart),
         (r"/assigned_hint_history_of_problem", AssignedHintHistoryofProblem),
-        (r"/realtime_user_problem_answers", RealtimeUserProblemAnswers),
-        (r"/problem_hints", ProblemHints),
-        (r"/realtime_problem_answer", RealtimeProblemAnswer),
-        (r"/hint_feedback", HintFeedback),
-        (r"/run_hint_filters", RunHintFilters),
-        (r"/apply_filter_functions", ApplyFilterFunctions),
-        (r"/hint_filter", HintFilter),
         (r"/assigned_hint_filter", AssignedHintFilter),
+        (r"/realtime_user_problem_answers", RealtimeUserProblemAnswers),
+        (r"/realtime_problem_answer", RealtimeProblemAnswer),
+        (r"/apply_filter_functions", ApplyFilterFunctions),
         (r"/set_ids", SetIds),
         (r"/sets", Sets),
         (r"/problems", Problems),
@@ -85,7 +77,14 @@ if __name__ == "__main__":
         (r"/export_problem_data", ExportProblemData),
         (r"/filter_answers", FilterAnswers),
         (r"/filter_functions", FilterFunctions),
-        (r"/assigned_filter_functions", AssignedFilterFunctions)
+        (r"/assigned_filter_functions", AssignedFilterFunctions),
+        (r"/answers_by_part_all_users", AnswersByPartAllUsers),
+        (r"/user_problem_hints", UserProblemHints)
+        #(r"/hint", Hint),
+        #(r"/problem_hints", ProblemHints),
+        #(r"/hint_feedback", HintFeedback),
+        #(r"/run_hint_filters", RunHintFilters),
+        #(r"/hint_filter", HintFilter)
     ], gzip=True, debug=True)
     # Start server
     application.listen(args.port, address=BIND_IP)
