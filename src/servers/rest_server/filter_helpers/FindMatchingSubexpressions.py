@@ -1,3 +1,10 @@
+"""
+This function find_matches takes as input two parsed and evaluated trees, one for the correct answer and one for the attempt.
+It finds the subexpressions that match between the correct and the attempt and returns it as a list of 
+tuples of the form (node,value,answer_part,attempt_part)
+
+The other functions are helpers that are called from find_matches.
+"""
 import sys
 from collections import deque
 from string import strip, replace
