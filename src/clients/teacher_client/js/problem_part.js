@@ -30,7 +30,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         integrateBootstrap: true
     }
 
-    $scope.filter_functions = [];
+    //$scope.filter_functions = [];
     
     $scope.hint_id = -1;
     $scope.input_id = null;
@@ -513,8 +513,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     $scope.save_filter = function(event){
         var ff = $scope.filter_function;
+        ff.name = ff.code.substring(4,ff.code.indexOf('('));
         console.log(ff);
-        if(!ff.id){
+        //if(!ff.id){
             HintsService.createFilterFunction(
                 ff.name, ff.course, ff.author, ff.code,
                 ff.set_id, ff.problem_id).success(function(new_ff_id){
@@ -522,13 +523,13 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                     loadfilters();
                 });
 
-        }else{
+        /*}else{
             console.log(ff.id);
             HintsService.updateFilterFunction(
                 ff.id, ff.code).success(function(){
                     loadfilters();
                 });
-        }
+        }*/
         ff.dirty = false;
     };
 
@@ -541,7 +542,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.load_filter = function(){
         HintsService.getFilterFunctions({name: $scope.filter_function.name}).
             success(function(data){
-                $scope.filter_function = data[0];
+                $scope.filter_function = data;//[0];
                 $scope.filter_function.dirty = false;
             });
     };
