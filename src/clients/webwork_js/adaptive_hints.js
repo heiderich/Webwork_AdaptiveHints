@@ -168,9 +168,9 @@
 		// SockJS server for each course 
 		// Only courses listed here will be affected by this script.
 		var router = {
-		    'UCSD_CSE103': 'http://webwork.cse.ucsd.edu:4350/student',
-		    'CSE103_Fall14': 'http://webwork.cse.ucsd.edu:4350/student',
-		    'CompoundProblems': 'http://webwork.cse.ucsd.edu:4349/student'
+		    'UCSD_CSE103': 'http://192.168.33.10:4350/student',
+		    'CSE103_Fall14': 'http://192.168.33.10:4350/student',
+		    'CompoundProblems': 'http://192.168.33.10:4349/student'
 		};
 
 		// Create a SockJS connection to the server
