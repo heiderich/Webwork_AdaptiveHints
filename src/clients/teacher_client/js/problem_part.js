@@ -433,7 +433,10 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.populate_filter_function = function() {
         $scope.filter_function = {
             code: "def " + $scope.filter_function_name + "(params):\n  "
-                + "# params = [answer_string, parse_tree, eval_tree, correct_string, correct_tree, correct_eval, user_vars] \n"
+                + '"""' + " Written by " + user_id + " " + new Date() + "\n  "
+                + "<Filter Description goes here>\n  "
+                + '"""\n  '
+                + "# params = {'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []} \n"
                 + "  import json\n  print json.dumps(params)\n  return False",
             author: Session.user_id,
             course: course,
