@@ -281,6 +281,7 @@ class ApplyFilterFunctions(ProcessQuery):
         time_filter_funcs = []
         for f in files:
             if f[0] != '_':
+                ### remove the doc string from code ###
                 code = a_filter_bank.get_code(filters_path, f)
                 while '\"\"\"' in code:
                     code = code[code.index('\"\"\"')+3:]
@@ -290,19 +291,25 @@ class ApplyFilterFunctions(ProcessQuery):
                 uni_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
             elif f[0] == "T":
                 time_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
-        
+
         txt = None
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
             #    continue
-            txt = a_filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
+            _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
+            if txt:
+                break
         if not txt:
             for func in uni_filter_funcs:
-                txt = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                if txt:
+                    break
         if not txt:
             #TODO: add time based condition
             for func in time_filter_funcs:
-                txt = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                if txt:
+                    break
         #TODO: handle the case where none of the condition apply
         logger.info("matched hint %s", txt)
 
