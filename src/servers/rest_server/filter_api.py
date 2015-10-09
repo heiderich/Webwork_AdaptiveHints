@@ -18,9 +18,9 @@ from datetime import datetime, timedelta
 from dateutil.tz import tzlocal
 import os
 import re
-from webwork_parser import parse_webwork
+#from webwork_parser import parse_webwork
 from auth import require_auth
-from Eval_parsed import eval_parsed, Collect_numbers, numbers_and_exps, parse_and_eval
+from parsetrees.expr_parser.Eval_parsed import parse_and_eval
 from multiprocessing import Process, Pipe, Queue, current_process
 from StringIO import StringIO
 from parsers import parse_eval
@@ -44,15 +44,21 @@ BASE = '/opt/AdaptiveHintsFilters'
 class FilterFunctions(ProcessQuery):
     """ /filter_functions """
 
-    # def __init__(self):
-    #     self.a_filter_bank = filter_bank()
-    #     self.a_filter_bank.import_filters_from_files('filter_helpers/')
-    #     self.a_filter_bank.import_filters_from_files('filters/')
-
     def set_default_headers(self):
         # Allows X-site requests
         super(ProcessQuery, self).set_default_headers()
         self.add_header("Access-Control-Allow-Methods", "PUT,DELETE")
+        self.reload_filters()
+
+    def reload_filters(self):
+        self.filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filters_path = os.path.join(basepath, "filters/")
+        filter_helpers_path = os.path.join(basepath, "filter_helpers/")
+        self.filter_bank.import_filters_from_files(filters_path)
+        self.filter_bank.import_filters_from_files(filter_helpers_path)
+        self.filters_dir = filters_path
+
 
     def filter_path(self, id):
         ''' Helper method for generating file path to put filter functions. '''
@@ -83,15 +89,11 @@ class FilterFunctions(ProcessQuery):
         #self.write(json.dumps(rows, default=serialize_datetime))
 
         # load from folder
-        a_filter_bank = filter_bank()
-        basepath = os.path.dirname(__file__)
-        filters_path = os.path.join(basepath, "../filters/")
-        a_filter_bank.import_filters_from_files(filters_path)
-        files = a_filter_bank.get_env_keys()
+        files = self.filter_bank.get_env_keys()
         functions = []
         for f in files:
-            if f[0] != "_":
-                functions += [{'name': f, 'code': a_filter_bank.get_code(filters_path, f), 'doc': a_filter_bank.get_docstring(f)}]
+            if f[0] == "U" or f[0] == "T" or f[0] == "C":
+                functions += [{'name': f, 'code': self.filter_bank.get_code(self.filters_dir, f), 'doc': self.filter_bank.get_docstring(f)}]
         self.write(json.dumps(functions, default=serialize_datetime))
 
     def post(self):
@@ -124,21 +126,21 @@ class FilterFunctions(ProcessQuery):
         #'''.format(name=name, course=course, author=author, set_id=set_id,
         #           problem_id=problem_id, hint_id=hint_id, code=code, created=now,
         #           updated=now)
-        ret = conn.execute(create_filter_function) # Returns row ID
+        #ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
-        a_filter_bank = filter_bank()
-        basepath = os.path.dirname(__file__)
-        filters_path = os.path.join(basepath, "../filters")
-        filter_helpers_path = os.path.join(basepath, "../filter_helpers")
-        a_filter_bank.import_filters_from_files(filter_helpers_path)
-        a_filter_bank.import_filters_from_files(filters_path)
-        a_filter_bank.add_filter(name,code)
-        save_to = os.path.abspath(os.path.join(basepath, "..", "filters", name))
+        # self.filter_bank = filter_bank()
+        # basepath = os.path.dirname(__file__)
+        # filters_path = os.path.join(basepath, "../filters")
+        # filter_helpers_path = os.path.join(basepath, "../filter_helpers")
+        # self.filter_bank.import_filters_from_files(filter_helpers_path)
+        # self.filter_bank.import_filters_from_files(filters_path)
+        self.filter_bank.add_filter(name,code)
+        save_to = os.path.abspath(os.path.join(self.filters_dir, name))
         with open(save_to+'.py', 'w') as f:
             f.write(code)
 
-        self.write(json.dumps(ret))
+        #self.write(json.dumps(ret))
 
     def put(self):
         id = self.get_argument('id')
@@ -155,50 +157,54 @@ class FilterFunctions(ProcessQuery):
         #ret = conn.execute(query)
 
         # update in filters folder
-        a_filter_bank = filter_bank()
-        basepath = os.path.dirname(__file__)
-        filters_path = os.path.join(basepath, "../filters")
-        filter_helpers_path = os.path.join(basepath, "../filter_helpers")
-        a_filter_bank.import_filters_from_files(filter_helpers_path)
-        a_filter_bank.import_filters_from_files(filters_path)
-        a_filter_bank.add_filter(name,code)
+        self.filter_bank.add_filter(name,code)
         #self.write(json.dumps(ret))
         #logger.debug(self.filter_path(id))
         
     def delete(self):
         pass
 
-def apply_filter(answer_data, user_vars, filter_function_string, pipe):
-    import os
-    import sys
-    import StringIO
-    import tempfile
-    USER_ID=1009
-    tempdir = tempfile.mkdtemp()
-    os.chown(tempdir, USER_ID, -1)
-    os.chroot(tempdir)
-    os.setuid(USER_ID)
+# def apply_filter(answer_data, user_vars, filter_function_string, pipe):
+#     import os
+#     import sys
+#     import StringIO
+#     import tempfile
+#     USER_ID=1009
+#     tempdir = tempfile.mkdtemp()
+#     os.chown(tempdir, USER_ID, -1)
+#     os.chroot(tempdir)
+#     os.setuid(USER_ID)
 
-    try:
-        logger.info("string")
-        logger.info(filter_function_string)
-        exec filter_function_string in globals(), locals()
-        a = answer_data
-        # This function must be defined by the exec'd code
-        ret = answer_filter(a['string'], a['parsed'], a['evaled'], a['correct_string'],
-                            a['correct_tree'], a['correct_eval'], user_vars)
-        pipe.send(ret)
-    except Exception, e:
-        logger.error("Error in filter function: %s", e)
-        print e
-    out.flush()
-    return
+#     try:
+#         logger.info("string")
+#         logger.info(filter_function_string)
+#         exec filter_function_string in globals(), locals()
+#         a = answer_data
+#         # This function must be defined by the exec'd code
+#         ret = answer_filter(a['string'], a['parsed'], a['evaled'], a['correct_string'],
+#                             a['correct_tree'], a['correct_eval'], user_vars)
+#         pipe.send(ret)
+#     except Exception, e:
+#         logger.error("Error in filter function: %s", e)
+#         print e
+#     out.flush()
+#     return
 
 class ApplyFilterFunctions(ProcessQuery):
     def set_default_headers(self):
         # Allows X-site requests
         super(ProcessQuery, self).set_default_headers()
         self.add_header("Access-Control-Allow-Methods", "PUT,DELETE")
+        self.reload_filters()
+
+    def reload_filters(self):
+        self.filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filters_path = os.path.join(basepath, "filters/")
+        filter_helpers_path = os.path.join(basepath, "filter_helpers/")
+        self.filter_bank.import_filters_from_files(filters_path)
+        self.filter_bank.import_filters_from_files(filter_helpers_path)
+        self.filters_dir = filters_path
 
     def post(self):
         """
@@ -212,45 +218,27 @@ class ApplyFilterFunctions(ProcessQuery):
         user_id = self.get_argument('user_id')
         answer_string = self.get_argument('answer_string')
         pg_file = self.get_source()
-        # Only run filters if at least 3 answers and at least 10 minutes since first answer
-        # try:
-        #     answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
-        #                             .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('count')
-        #     first_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
-        # ORDER BY timestamp ASC LIMIT 1;'''
-        #                             .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
-        #     last_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
-        # ORDER BY timestamp DESC LIMIT 1;'''
-        #                            .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
-        #     diff = last_answer-first_answer
-        #     if answer_count < 3 or diff < timedelta(minutes=10):
-        #         self.write(json.dumps({}))
-        #         return
-        # except:
-        #     logger.warn('Error')
-        #     self.write(json.dumps({}))
-        #     return
-        # Get any hints already assigned to user
-        #hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
-        #                            .format(course=course,
-        #                                    WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
-        #                                    part_id=part_id))
-        #hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
+
+        # re.compile(r'\[__+\]{(?:Compute\(")?(.+?)(?:"\))?}')
+        answer_re = re.compile('\[__+\]{(?:(?:Compute\(")(.+?)(?:"\))(?:.*)|(.+?))}')
+        answer_boxes = answer_re.findall(pg_file)
+        part_answer = answer_boxes[part_id-1][0] or answer_boxes[part_id-1][1]
+        
         # Get student's variables, parse their answer, their correct answer
         user_variables = conn.query('''SELECT * from {course}_user_variables
         WHERE set_id="{set_id}" AND problem_id = {problem_id} AND user_id = "{user_id}";
         '''.format(course=course, set_id=set_id, problem_id=problem_id, user_id=user_id))
 
         user_variables = {row['name']: row['value'] for row in user_variables}
-        # re.compile(r'\[__+\]{(?:Compute\(")?(.+?)(?:"\))?}')
-        answer_re = re.compile('\[__+\]{(?:(?:Compute\(")(.+?)(?:"\))(?:.*)|(.+?))}')
-        answer_boxes = answer_re.findall(pg_file)
-        part_answer = answer_boxes[part_id-1][0] or answer_boxes[part_id-1][1]
+        # Replace variable with values
+        for var in user_variables:
+            if var['name'] in part_answer:
+                part_answer = part_answer.replace(var['name'], str(var['value']))
+        
         answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
         ptree, etree = parse_and_eval(answer_string)
-        answer_data = {'string': answer_string, 'parsed': ptree, 'evaled': etree,
-                       'correct_string': part_answer, 'correct_tree': answer_ptree,
-                       'correct_eval': answer_etree}
+        answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
+                        'ans_tree': answer_etree, 'variables': user_variables}
         # #get conditional filter functions
         # conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
         # af.problem_id, af.part_id FROM filter_functions as ff
@@ -270,57 +258,75 @@ class ApplyFilterFunctions(ProcessQuery):
         #logger.debug('Filters: %s', filter_funcs)
 
         # load from folder
-        a_filter_bank = filter_bank()
-        basepath = os.path.dirname(__file__)
-        logger.info(basepath)
-        filters_path = os.path.join(basepath, "../filters/")
-        a_filter_bank.import_filters_from_files(filters_path)
-        files = a_filter_bank.get_env_keys()
+        files = self.filter_bank.get_env_keys()
         con_filter_funcs = []
         uni_filter_funcs = []
         time_filter_funcs = []
         for f in files:
-            if f[0] != '_':
-                ### remove the doc string from code ###
-                code = a_filter_bank.get_code(filters_path, f)
-                while '\"\"\"' in code:
-                    code = code[code.index('\"\"\"')+3:]
+            ### remove the doc string from code ###
+            #code = self.filter_bank.get_code(self.filters_dir, f)
+            #while '\"\"\"' in code:
+            #    code = code[code.index('\"\"\"')+3:]
             if f[0] == "C":
-                con_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
+                code = self.filter_bank.get_code(self.filters_dir, f)
+                con_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
             elif f[0] == "U":
-                uni_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
+                code = self.filter_bank.get_code(self.filters_dir, f)
+                uni_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
             elif f[0] == "T":
-                time_filter_funcs += [{'name': f, 'code': code, 'doc': a_filter_bank.get_docstring(f)}]
+                code = self.filter_bank.get_code(self.filters_dir, f)
+                time_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
 
         txt = None
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
             #    continue
-            _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
+            _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
             if txt:
                 break
         if not txt:
             for func in uni_filter_funcs:
-                _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                 if txt:
                     break
         if not txt:
-            #TODO: add time based condition
-            for func in time_filter_funcs:
-                _,txt,_ = a_filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
-                if txt:
-                    break
-        #TODO: handle the case where none of the condition apply
-        logger.info("matched hint %s", txt)
+            # Only run filters if at least 3 answers and at least 5 minutes since first answer
+            try:
+                answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
+                                        .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('count')
+                first_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
+            ORDER BY timestamp ASC LIMIT 1;'''
+                                        .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
+                last_answer = conn.get('''SELECT timestamp from {course}_answers_by_part {WHERE}
+            ORDER BY timestamp DESC LIMIT 1;'''
+                                       .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
+                diff = last_answer-first_answer
+                if answer_count > 3 and diff > timedelta(minutes=5):
+                    for func in time_filter_funcs:
+                        _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                        if txt:
+                            break
+            except Exception, e:
+                logger.warn('Error: ' + e)
+                self.write(json.dumps({}))
+                return
+            # Get any hints already assigned to user
+            # hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
+            #                            .format(course=course,
+            #                                    WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
+            #                                    part_id=part_id))
+            # hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
+            
+        #handle the case where none of the condition apply
+        if txt == None:
+            txt = ""
+            logger.info("no match hint")
+        else:
+            logger.info("matched hint %s", txt)
 
         # Send hint with 50% chance
         send = bool(random.getrandbits(1))
 
-        # # create a temp file
-        # temp = tempfile.NamedTemporaryFile(delete=False)
-        # temp.write(txt)
-        # temp.close()
-        # # render hint
         ret = {}
         ret['hint_html'] = txt
         ret['location'] = "AnSwEr"+("0000"+str(part_id))[-4:]
@@ -328,26 +334,26 @@ class ApplyFilterFunctions(ProcessQuery):
         ret['assigned'] = int(send)
         self.write(json.dumps(ret))
 
-    def exec_filter_func(self, code, answer_data, user_variables):
-        parent, child = Pipe()
-        p = Process(target=apply_filter, args=(answer_data, user_variables, code, child))
-        p.start()
-        # TODO Can we do this without blocking the process?
-        p.join(timeout=15)
-        if p.is_alive():
-            logger.warn("Function took too long, we killed it.")
-            p.terminate()
-            #ret[func.hint_id] = None
-            return ""
-        else:
-            result = parent.recv()
-            logger.debug("Got this back: %s", result)
-            if type(result) == str:
-                #ret[func.hint_id] = result
-                return result
-            else:
-                #ret[func.hint_id] = None
-                return ""
+    # def exec_filter_func(self, code, answer_data, user_variables):
+    #     parent, child = Pipe()
+    #     p = Process(target=apply_filter, args=(answer_data, user_variables, code, child))
+    #     p.start()
+    #     # TODO Can we do this without blocking the process?
+    #     p.join(timeout=15)
+    #     if p.is_alive():
+    #         logger.warn("Function took too long, we killed it.")
+    #         p.terminate()
+    #         #ret[func.hint_id] = None
+    #         return ""
+    #     else:
+    #         result = parent.recv()
+    #         logger.debug("Got this back: %s", result)
+    #         if type(result) == str:
+    #             #ret[func.hint_id] = result
+    #             return result
+    #         else:
+    #             #ret[func.hint_id] = None
+    #             return ""
 
 class AssignedFilterFunctions(ProcessQuery):
     def get(self):

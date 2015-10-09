@@ -286,7 +286,8 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
         logger.debug('after sending sql query')
 
         a_filter_bank=filter_bank()
-        status=a_filter_bank.add_filter('answer_filter',filter_function)
+        func_name = filter_function[4:filter_function.index('(')]
+        status=a_filter_bank.add_filter(func_name,filter_function)
         if status!=None:
             print "ERROR LOADING FUNCTION"+status
             return status
@@ -310,7 +311,7 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
             self.answer_ptree, self.answer_etree = parse_eval(self.part_answer)
             ans = self.answer_for_student(user_id)
             if ptree and etree:
-                status,hint,output=a_filter_bank.exec_filter('answer_filter',(attempt, ptree, etree, self.part_answer, self.answer_ptree, self.answer_etree, student_vars))
+                status,hint,output=a_filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':student_vars})
                 if status:
                     logger.debug('exec_filter succeeded, attempt=%s,hint=%s,output=%s'%(attempt,hint,output))
                     _hints.append(hint)
