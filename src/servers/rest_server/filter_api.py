@@ -126,7 +126,7 @@ class FilterFunctions(ProcessQuery):
         #'''.format(name=name, course=course, author=author, set_id=set_id,
         #           problem_id=problem_id, hint_id=hint_id, code=code, created=now,
         #           updated=now)
-        ret = conn.execute(create_filter_function) # Returns row ID
+        #ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
         # self.filter_bank = filter_bank()
@@ -136,11 +136,11 @@ class FilterFunctions(ProcessQuery):
         # self.filter_bank.import_filters_from_files(filter_helpers_path)
         # self.filter_bank.import_filters_from_files(filters_path)
         self.filter_bank.add_filter(name,code)
-        save_to = os.path.abspath(os.path.join(basepath, "..", "filters", name))
+        save_to = os.path.abspath(os.path.join(self.filters_dir, name))
         with open(save_to+'.py', 'w') as f:
             f.write(code)
 
-        self.write(json.dumps(ret))
+        #self.write(json.dumps(ret))
 
     def put(self):
         id = self.get_argument('id')
@@ -237,8 +237,8 @@ class ApplyFilterFunctions(ProcessQuery):
         
         answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
         ptree, etree = parse_and_eval(answer_string)
-        answer_data = {'attempt': answer_string, 'attempt_tree': ptree, 'answer': part_answer,
-                        'answer_tree': answer_ptree, 'variables': user_variables}
+        answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
+                        'ans_tree': answer_etree, 'variables': user_variables}
         # #get conditional filter functions
         # conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
         # af.problem_id, af.part_id FROM filter_functions as ff
