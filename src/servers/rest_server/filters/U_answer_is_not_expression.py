@@ -1,5 +1,5 @@
 def U_answer_is_not_expression(params):
-    #{'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []}
+    #{'attempt': answer_string, 'attemp_tree': ptree, 'answer': part_answer, 'answer_tree': answer_ptree, 'variables': user_variables}
     if params['evaled'] == None:
     	return ""
     if len(params['evaled'])==1:
