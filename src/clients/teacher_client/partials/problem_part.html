@@ -102,6 +102,7 @@
           <tr>
             <th>Filter Name</th>
             <th>Filter Description</th>
+            <th>Filter Type</th>
             <th>Author</th>
           </tr>
         </thead>
@@ -123,7 +124,7 @@
         </p>
       </div>
       Filter Name <input id="filter_function_name"/>
-      Filter Type <select id="filter_function_type"><option value="C">Conditional</option><option value="U">Universal</option></select>
+      Filter Type <select id="filter_function_type"><option value="C">Conditional</option><option value="T">Time Based</option></select>
       <button type="button" class="btn btn-primary btn-xs" ng-click="generate_filter_template()">Generate Filter Template</button>
       <form class="form-inline">
         <div ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
