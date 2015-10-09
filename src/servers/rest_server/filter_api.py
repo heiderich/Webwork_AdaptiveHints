@@ -114,12 +114,12 @@ class FilterFunctions(ProcessQuery):
         #hint_id = conn.execute(create_hint)
         #logger.debug(hint_id)
         now = datetime.now().isoformat()
-        create_filter_function = ''' INSERT INTO filter_functions
-        (name, course, author, set_id, problem_id, code, dummy_hint_id, created, updated, function_type)
-        values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{hint_id}", "{created}", "{updated}", "{function_type}");
-        '''.format(name=name, course=course, author=author, set_id=set_id,
-                   problem_id=problem_id, code=code, hint_id=0, created=now,
-                   updated=now, function_type=function_type)
+        #create_filter_function = ''' INSERT INTO filter_functions
+        #(name, course, author, set_id, problem_id, code, dummy_hint_id, created, updated, function_type)
+        #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, "{code}", "{hint_id}", "{created}", "{updated}", "{function_type}");
+        #'''.format(name=name, course=course, author=author, set_id=set_id,
+        #           problem_id=problem_id, code=code, hint_id=0, created=now,
+        #           updated=now, function_type=function_type)
         #create_filter_function = ''' INSERT INTO filter_functions
         #(name, course, author, set_id, problem_id, dummy_hint_id, code, created, updated)
         #values ("{name}", "{course}", "{author}", "{set_id}", {problem_id}, {hint_id}, "{code}", "{created}", "{updated}");
@@ -129,12 +129,6 @@ class FilterFunctions(ProcessQuery):
         #ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
-        # self.filter_bank = filter_bank()
-        # basepath = os.path.dirname(__file__)
-        # filters_path = os.path.join(basepath, "../filters")
-        # filter_helpers_path = os.path.join(basepath, "../filter_helpers")
-        # self.filter_bank.import_filters_from_files(filter_helpers_path)
-        # self.filter_bank.import_filters_from_files(filters_path)
         self.filter_bank.add_filter(name,code)
         save_to = os.path.abspath(os.path.join(self.filters_dir, name))
         with open(save_to+'.py', 'w') as f:
@@ -239,6 +233,15 @@ class ApplyFilterFunctions(ProcessQuery):
         ptree, etree = parse_and_eval(answer_string)
         answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
                         'ans_tree': answer_etree, 'variables': user_variables}
+        logger.debug(answer_data)
+        if etree == None:
+            logger.error("att_tree is None")
+            return
+        if answer_etree == None:
+            logger.error("ans_tree is None")
+            return
+
+
         # #get conditional filter functions
         # conditional_filter_funcs = conn.query('''SELECT ff.id, ff.code, af.hint_id, af.course, af.set_id,
         # af.problem_id, af.part_id FROM filter_functions as ff
@@ -277,19 +280,29 @@ class ApplyFilterFunctions(ProcessQuery):
                 code = self.filter_bank.get_code(self.filters_dir, f)
                 time_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
 
-        txt = None
+        txt = ""
+        correct_set_problem_part = str(set_id) + "_" + str(problem_id) + "_" + str(part_id)
+        success = False        
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
             #    continue
-            _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
-            if txt:
-                break
-        if not txt:
-            for func in uni_filter_funcs:
-                _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
-                if txt:
+            if correct_set_problem_part in func['name']:
+                success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
+                #TODO: remove the length check when things become reliable
+                if txt != "" and success and len(txt) < 100:
                     break
-        if not txt:
+                else:
+                    success = False
+        if not success:
+            for func in uni_filter_funcs:
+                if correct_set_problem_part in func['name']:
+                    success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                    #TODO: remove the length check when things become reliable
+                    if txt != "" and success and len(txt) < 100:
+                        break
+                    else:
+                        success = False
+        if not success:
             # Only run filters if at least 3 answers and at least 5 minutes since first answer
             try:
                 answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
@@ -303,9 +316,13 @@ class ApplyFilterFunctions(ProcessQuery):
                 diff = last_answer-first_answer
                 if answer_count > 3 and diff > timedelta(minutes=5):
                     for func in time_filter_funcs:
-                        _,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
-                        if txt:
-                            break
+                        if correct_set_problem_part in func['name']:
+                            success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                            #TODO: remove the length check when things become reliable
+                            if txt != "" and success and len(txt) < 100:
+                                break
+                            else:
+                                success = False
             except Exception, e:
                 logger.warn('Error: ' + e)
                 self.write(json.dumps({}))
@@ -318,7 +335,7 @@ class ApplyFilterFunctions(ProcessQuery):
             # hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
             
         #handle the case where none of the condition apply
-        if txt == None:
+        if not success:
             txt = ""
             logger.info("no match hint")
         else:
