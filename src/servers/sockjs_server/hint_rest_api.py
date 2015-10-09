@@ -239,10 +239,12 @@ class HintRestAPI(object):
             then send the rendered hint along with its location to the
             assign_hint API '''
         base_url = HintRestAPI._baseurl
+        pg_header = "DOCUMENT();\nloadMacros(\"PGstandard.pl\",\"PGunion.pl\",\"PGML.pl\",\"Parser.pl\",\"parserMultiAnswer.pl\",\"PGcourse.pl\",);BEGIN_PGML \n"
+        pg_footer = "\n END_PGML \n ENDDOCUMENT();"
         # GET /hint
         #r = requests.get(base_url+'/hint', params={'course':course,  'hint_id':hint_id}).json()
         if hint_PGML:
-            pg_text = '%s\n%s\n%s'%('DOCUMENT();', hint_PGML, 'ENDDOCUMENT();')
+            pg_text = pg_header + hint_PGML + pg_footer
             #pg_text = '%s\n%s\n%s'%(r['pg_header'], hint_PGML, r['pg_footer'])
         #else:
             #pg_text = '%s\n%s\n%s'%(r['pg_header'], r['pg_text'], r['pg_footer'])
@@ -255,17 +257,18 @@ class HintRestAPI(object):
         r = requests.post(base_url+'/render', data={'pg_file':pg_text,
             'seed':seed}).json()
         h = r['rendered_html']
+
         # Clean up rendering
         div_match = re.compile(r'^.*<div',flags=re.MULTILINE)
         h = div_match.sub('<div', h).strip().replace('AnSwEr0001', 'HINTBOXID')
-        h = h + '<div style="clear:left;">' + \
-            '<input type="radio" name="feedback_' + \
-            'HINTBOXID' + '" value="too hard">Too hard' + \
-            '<input type="radio" name="feedback_' + \
-            'HINTBOXID'  + '" value="easy but unhelpful">Easy but unhelpful' + \
-            '<input type="radio" name="feedback_' + \
-            'HINTBOXID' + '" value="helpful">Helpful' + \
-            '</div>'
+        # h = h + '<div style="clear:left;">' + \
+        #     '<input type="radio" name="feedback_' + \
+        #     'HINTBOXID' + '" value="too hard">Too hard' + \
+        #     '<input type="radio" name="feedback_' + \
+        #     'HINTBOXID'  + '" value="easy but unhelpful">Easy but unhelpful' + \
+        #     '<input type="radio" name="feedback_' + \
+        #     'HINTBOXID' + '" value="helpful">Helpful' + \
+        #     '</div>'
         # POST to /assigned_hint
         params = {'user_id':user_id, 'course':course,
                   'set_id':set_id, 'problem_id':problem_id, 'pg_id':pg_id,

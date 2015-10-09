@@ -437,8 +437,8 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 + '"""' + " Written by " + user_id + " " + new Date() + "\n  "
                 + "<Filter Description goes here>\n  "
                 + '"""\n  '
-                + "# params = {'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []} \n"
-                + "  import json\n  print json.dumps(params)\n  return False",
+                + "# params = {'attempt': '', 'att_tree': [], 'answer': '', 'ans_tree': [], 'variables': [{'name':,'value':}]} \n"
+                + "  import json\n  print json.dumps(params)\n  return ''",
             author: Session.user_id,
             course: course,
             dirty: true,
