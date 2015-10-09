@@ -2,7 +2,7 @@ def U_answer_should_be_int(params):
     """Written by Yoav Freund, Sat Sep 19 17:09:48 PDT 2015
     Assumes answer should be an integer number, send a hint if not
     """
-    #{'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []}
+    #{'attempt': answer_string, 'attemp_tree': ptree, 'answer': part_answer, 'answer_tree': answer_ptree, 'variables': user_variables}
     eval_tree = params['evaled']
     if eval_tree == None:
         return ""

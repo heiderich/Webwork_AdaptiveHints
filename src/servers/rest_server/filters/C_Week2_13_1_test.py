@@ -1,6 +1,6 @@
 def C_Week2_13_1_test(params):
-	#{'string': '', 'correct_eval': None, 'correct_tree': []], 'evaled': None, 'correct_string': '', 'parsed': []}
-	answer = params["string"]
+	#{'attempt': answer_string, 'attemp_tree': ptree, 'answer': part_answer, 'answer_tree': answer_ptree, 'variables': user_variables}
+	answer = params["attempt"]
 	if answer == "good":
 		return "not good right?[_____]{'right'}"
 	else:
