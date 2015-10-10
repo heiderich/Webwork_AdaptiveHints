@@ -10,9 +10,10 @@ from collections import deque
 from string import strip, replace
 import json
 from collections import Counter
-sys.path.append("../../../parsetrees/expr_parser/")
-from Eval_parsed import eval_parsed
-from webwork_parser import parse_webwork
+
+sys.path.append('../../..')
+from parsetrees.expr_parser.Eval_parsed import parse_and_eval
+#from webwork_parser import parse_webwork
 
 # Set up a logging object
 import logging
@@ -46,10 +47,10 @@ def flatten(tree,tag):
                     List.append([current[0][1],tag,current])
                     Queue.extend(current[1:])
                 else:
-                    logger.error('parse error (is list): current=%s, tree=%s'%(str(current),str(tree)))
+                    logger.error('parse error (is list): \ncurrent=%s, \ntree=%s'%(str(current),str(tree)))
                     return []
             else:
-                logger.error('parse error (not list): current=%s, tree=%s'%(str(current),str(tree)))
+                logger.error('parse error (not list): \ncurrent=%s, \ntree=%s'%(str(current),str(tree)))
                 return []
     except Exception as error:
         logger.exception(error)
@@ -119,19 +120,16 @@ def find_dominating_hits(Hits,answer,attempt):
             final_matches.append((node,value,answer_part,attempt_part))
     return final_matches
 
-def find_matches(answer,attempt):
+def find_matches(params):
 
-    logger.debug('find_matches recieved answer='+str(answer)+' attempt='+str(attempt))
-    attempt_parsed=parse_webwork(attempt)
-    logger.debug('calling eval_parsed on on'+str(attempt_parsed))
-    attempt_tree=eval_parsed(attempt_parsed)
-    logger.debug('calling flatten on'+str(attempt_tree))
+    attempt=params['attempt']
+    attempt_tree=params['att_tree']
+    logger.debug('calling flattenon'+str(attempt_tree))
     attempt_list=flatten(attempt_tree,'t')
     logger.debug( 'attempt list:\n'+str(attempt_list))
     
-    answer_parsed=parse_webwork(answer)
-    logger.debug('calling eval_parsed on on'+str(answer_parsed))
-    answer_tree=eval_parsed(answer_parsed)
+    answer=params['answer']
+    answer_tree=params['ans_tree']
     logger.debug('calling flatten on'+str(answer_tree))
     answer_list=flatten(answer_tree,'c')
     logger.debug('answer list\n'+str(answer_list))
@@ -147,52 +145,50 @@ def find_matches(answer,attempt):
     return final_matches
 
 if __name__=="__main__":
-    if len(sys.argv)==3:
-        final_pairs=find_matches(sys.argv[1],sys.argv[2])
+    if len(sys.argv)==3:   #parameters are two expressions
+        params={}
+        params['answer']=sys.argv[1]
+        params['attempt']=sys.argv[2]
+        params['ans_tree']=parse_and_eval(params['answer'])
+        params['att_tree']=parse_and_eval(params['attempt'])
+        print 'params=',params
+        final_pairs=find_matches(params)
         for item in final_pairs:
             print "node=%s, value=%s, The piece %s in your answer is correct, it can also be expressed as %s"%(item[0],item[1],item[3],item[2])
 
-    elif len(sys.argv)==2:
+    elif len(sys.argv)==2: # param is the name of a file containing a dump of attempts with their parse trees and variables
         file=open(sys.argv[1],'r')
-        print file.readline()
-        answer_expression=strip(file.readline())
-        print "|%s|"%answer_expression
+        #print file.readline()
+        #params=json.loads(file.readline())
+
         Clusters=Counter()
         Reps={}
         for line in file.readlines():
             params=json.loads(line)
-            attempt=params[0]
-            attempt = ''.join(attempt.split()) # remove whitespaces
-            variables=params[6]
-            answer=answer_expression
-            for name,val in variables.items():
-                if int(val)==val:
-                    val=int(val)
-                    answer=answer.replace(name,str(val))
-                # print 'attempt=',attempt,'answer=',answer,'variables=',variables
-                final_pairs=find_matches(answer,attempt)
-                if len(final_pairs)>0:
-                    for node,value,ans_piece,attempt_piece in final_pairs:
-                        if value>10 or value != int(value):
-                            #Update clusters
-                            if not node in Reps.keys():
-                                Reps[node]=ans_piece
-                            Clusters[node]+=1
-                            # print hint
-                            if node=='R': # attempt is correct
-                                sub_type='answer'
-                            else:
-                                sub_type='sub-expression'
-                            print '-'*50
-                            print 'attempt=',attempt,'answer=',answer
-                            if attempt_piece != ans_piece:
-                                print 'The %s %s is correct, it could also be written as %s'%(sub_type,attempt_piece,ans_piece)
-                            else:
-                                print 'The %s %s is correct'%(sub_type,attempt_piece)
+            params['attempt'] = ''.join(params['attempt'].split()) # remove whitespaces
+            final_pairs=find_matches(params)
+            if len(final_pairs)>0:
+                for node,value,ans_piece,attempt_piece in final_pairs:
+                    if value>10 or value != int(value):
+                        #Update clusters
+                        if not node in Reps.keys():
+                            Reps[node]=ans_piece
+                        Clusters[node]+=1
+                        # print hint
+                        if node=='R': # attempt is correct
+                            sub_type='answer'
                         else:
-                            Clusters['Nothing']+=1
-                else:
-                    Clusters['Nothing']+=1
+                            sub_type='sub-expression'
+                        print '-'*50
+                        print 'attempt=',attempt,'answer=',answer
+                        if attempt_piece != ans_piece:
+                            print 'The %s %s is correct, it could also be written as %s'%(sub_type,attempt_piece,ans_piece)
+                        else:
+                            print 'The %s %s is correct'%(sub_type,attempt_piece)
+                    else:
+                        Clusters['Nothing']+=1
+            else:
+                Clusters['Nothing']+=1
 
 
         print 'Clusters='
