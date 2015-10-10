@@ -1,3 +1,15 @@
+### The parameters passed to the filter
+Are in the form of a dictionary, the signature of this dictionary is: `answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
+                        'ans_tree': answer_etree, 'variables':
+						user_variables}`
+						
+Where `attempt` is the string entered by the student. `answer` is the
+string representing the answer (after PG variables have been
+substituted with their values). `att_tree` is the tree corresponding
+to `attempt` and `ans_tree` is the tree corresponding
+to `answer`. Finally `user_variables` is a dictionary defining the
+value associated with each PG variable.
+
 ### The syntax and semantics of the parse and eval tree.
 
 * The tree is defined recursively, starting with the root. a root consists of a root node descriptor and a list (possibly empty) of trees.
@@ -13,7 +25,7 @@ Pay attemtion to the representation of the leaves. The leaves are lists of the f
 
 
 
-### Examples
+#### Examples of expressions and their parse tree
 
 attempt = `462/2^10`
 

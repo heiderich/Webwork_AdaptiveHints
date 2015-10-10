@@ -40,14 +40,14 @@ def find_common_values(e1,e2):
     """
     
 
-def eval_parsed(e, label='R',variables = None):
+def eval_parsed(e, label='R'):
     """ Evaluate a parsed expression, returns a tree, of the same form as the parse tree. Where each operator 
         is replaced by a tuple: (operator,evaluation result)
     
         Still need to write code to handle varibles, lists and sets.
     """
-    if variables is None:
-        variables = {}
+    print 'in eval_parsed e=|%s|, label=|%s|'%(str(e),str(label))
+
     def get_number(ev):
         #print 'get_number got',ev
         if len(ev)==4 and ev[0]=='X': 
@@ -63,20 +63,13 @@ def eval_parsed(e, label='R',variables = None):
             return 0
         elif is_number(e)==1:
             return (float(e),)
-        # elif type(e) == str: # Variable
-        #     if e in variables:
-        #         return (variables[e],)
-        #     else:
-        #         print "Couldn't find", e, "in",variables
-        #         return (e,) # Variables will cause things to break right now
         elif len(e)==2:
             [[f,span],op]=e
 
             if f=='{}':
-                return e  # if element is a list, just return as is.
-                          # might need to improve this if we want sets of expressions
+                return [[f,None,span,label],op]  # if element is a list, just return as is.
 
-            ev=eval_parsed(op,label+'.0',variables)
+            ev=eval_parsed(op,label+'.0')
             v=get_number(ev)
             
             if f=='X':  # X indicates a single number
@@ -94,9 +87,9 @@ def eval_parsed(e, label='R',variables = None):
         
         elif len(e)==3:
             [[f,span],op1,op2]=e
-            ev1=eval_parsed(op1, label+'.0',variables)
+            ev1=eval_parsed(op1, label+'.0')
             v1=get_number(ev1)
-            ev2=eval_parsed(op2, label+'.1',variables)
+            ev2=eval_parsed(op2, label+'.1')
             v2=get_number(ev2)
 
             if f=='+':    ans= v1+v2
@@ -152,16 +145,16 @@ def parse_and_collect_numbers(string):
     except:
         return set()
 
-def parse_and_eval(string, variables=None):
+def parse_and_eval(string):
     expr = parse_webwork(string)
     if expr:
         try:
-            etree = eval_parsed(expr, variables)
-            return expr, etree
+            etree = eval_parsed(expr)
+            return etree
         except:
-            return (None, None)
+            return None
     else:
-        return (None, None)
+        return None
 
 if __name__=="__main__":
     string=sys.argv[1]
