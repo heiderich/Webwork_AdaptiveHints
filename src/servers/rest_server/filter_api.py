@@ -229,8 +229,8 @@ class ApplyFilterFunctions(ProcessQuery):
             if var in part_answer:
                 part_answer = part_answer.replace(var, str(user_variables[var]))
         
-        answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
-        ptree, etree = parse_and_eval(answer_string)
+        answer_etree = parse_and_eval(part_answer)
+        etree = parse_and_eval(answer_string)
         answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
                         'ans_tree': answer_etree, 'variables': user_variables}
         logger.debug(answer_data)
@@ -345,7 +345,8 @@ class ApplyFilterFunctions(ProcessQuery):
 
         # Send hint with 50% chance
         send = bool(random.getrandbits(1))
-
+        logger.info("sent confirm: ", str(send))
+        
         ret = {}
         ret['hint_html'] = txt
         ret['location'] = "AnSwEr"+("0000"+str(part_id))[-4:]
