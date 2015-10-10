@@ -226,8 +226,8 @@ class ApplyFilterFunctions(ProcessQuery):
         user_variables = {row['name']: row['value'] for row in user_variables}
         # Replace variable with values
         for var in user_variables:
-            if var['name'] in part_answer:
-                part_answer = part_answer.replace(var['name'], str(var['value']))
+            if var in part_answer:
+                part_answer = part_answer.replace(var, str(user_variables[var]))
         
         answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
         ptree, etree = parse_and_eval(answer_string)
@@ -303,7 +303,8 @@ class ApplyFilterFunctions(ProcessQuery):
                     else:
                         success = False
         if not success:
-            # Only run filters if at least 3 answers and at least 5 minutes since first answer
+            logger.info("checking timebased")
+            # Only run filters if at least 3 answers and at least 3 minutes since first answer
             try:
                 answer_count = conn.get('''SELECT COUNT(*) as count from {course}_answers_by_part {WHERE};'''
                                         .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('count')
@@ -314,7 +315,8 @@ class ApplyFilterFunctions(ProcessQuery):
             ORDER BY timestamp DESC LIMIT 1;'''
                                        .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
                 diff = last_answer-first_answer
-                if answer_count > 3 and diff > timedelta(minutes=5):
+                if answer_count > 3 and diff > timedelta(minutes=3):
+                    logger.info("sending")
                     for func in time_filter_funcs:
                         if correct_set_problem_part in func['name']:
                             success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
