@@ -227,7 +227,7 @@ class ApplyFilterFunctions(ProcessQuery):
         # Replace variable with values
         for var in user_variables:
             if var in part_answer:
-                part_answer = part_answer.replace(var, user_variables[var])
+                part_answer = part_answer.replace(var, str(user_variables[var]))
         
         answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
         ptree, etree = parse_and_eval(answer_string)
