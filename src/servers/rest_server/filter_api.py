@@ -315,7 +315,7 @@ class ApplyFilterFunctions(ProcessQuery):
             ORDER BY timestamp DESC LIMIT 1;'''
                                        .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
                 diff = last_answer-first_answer
-                if answer_count > 3 and diff > timedelta(minutes=3):
+		if answer_count > 3 and diff > timedelta(minutes=3):
                     logger.info("sending")
                     for func in time_filter_funcs:
                         if correct_set_problem_part in func['name']:
