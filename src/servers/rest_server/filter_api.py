@@ -326,7 +326,7 @@ class ApplyFilterFunctions(ProcessQuery):
                             else:
                                 success = False
             except Exception, e:
-                logger.warn('Error: ' + e)
+                logger.warn('Error: ' + str(e))
                 self.write(json.dumps({}))
                 return
             # Get any hints already assigned to user
