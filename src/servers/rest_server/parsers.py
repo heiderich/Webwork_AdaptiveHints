@@ -256,9 +256,9 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
         user_variables = conn.query('''SELECT * from {course}_user_variables
         WHERE set_id="{set_id}" AND problem_id = {problem_id};
         '''.format(course=course, set_id=set_id, problem_id=problem_id))
-        logger.info(user_variables)
+        logger.info("ZHEN", user_variables)
         self.variables_df = pd.DataFrame(user_variables)
-        logger.info(self.variables_df)
+        logger.info("Zhen", self.variables_df)
         logger.debug('computing user vars. user_variables=%s, self_variables_df=%s'%(str(user_variables),str(self.variables_df)))
         if len(self.variables_df) == 0:
             logger.warn("No user variables saved for assignment %s, please run the save_answers script", set_id)
