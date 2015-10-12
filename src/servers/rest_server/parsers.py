@@ -256,11 +256,10 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
         user_variables = conn.query('''SELECT * from {course}_user_variables
         WHERE set_id="{set_id}" AND problem_id = {problem_id};
         '''.format(course=course, set_id=set_id, problem_id=problem_id))
-        logger.info("ZHEN_DEBUGING", user_variables)
-        self.variables_df = pd.DataFrame(user_variables)
-        logger.info("ZHEN_DEBUGING", self.variables_df)
-        logger.debug('computing user vars. user_variables=%s, self_variables_df=%s'%(str(user_variables),str(self.variables_df)))
-        if len(self.variables_df) == 0:
+        self.user_variables = {row['name']: row['value'] for row in user_variables}
+        
+        #logger.debug('computing user vars. user_variables=%s, self_variables_df=%s'%(str(user_variables),str(self.variables_df)))
+        if len(user_variables) == 0:
             logger.warn("No user variables saved for assignment %s, please run the save_answers script", set_id)
 
         # Get the answer from pg file
@@ -302,11 +301,8 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
             user_id = a['user_id']
             attempt=a['answer_string']
             etree = parse_and_eval(attempt)
-            user_vars = self.variables_df
-            if len(user_vars) > 0:
-                student_vars = dict(user_vars[user_vars['user_id']==user_id][['name', 'value']].values.tolist())
-            else:
-                student_vars = {}
+            student_vars = self.user_variables
+            
             # Replace variable with values
             for key in student_vars:
                 if key in self.part_answer:
