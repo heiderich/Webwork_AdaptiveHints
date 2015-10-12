@@ -289,7 +289,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             }).error(function(data){console.log(data);});
     };*/
 
-    $scope.get_student_hint_history = function(){
+    /*$scope.get_student_hint_history = function(){
         var student_hint_history = {};
         HintsService.assignedHintHistoryByProblemPart(course, problem_id, set_id, part_value).success(function(data){
             for (d in data) {
@@ -299,7 +299,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             }
         });
         return student_hint_history;
-    };
+    };*/
 
     WebworkService.problemPartStatus(course, set_id, problem_id, part_id).success(function(data){
         $scope.completion_data = data;
