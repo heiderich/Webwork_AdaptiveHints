@@ -111,13 +111,15 @@ class filter_bank:
         old_stdout=sys.stdout
         sys.stdout=StringIO.StringIO()
 
+        error = False
         try:  # exception should go just over exec and should generate a complete traceback in case of error
             self.__exec__(command)
         except:
             exc_type, exc_value, exc_traceback = sys.exc_info()
             stdout_dump=sys.stdout.getvalue()
             error_message=traceback.format_exc()
-            #logger.error('Runtime Error in Filter:'+error_message)
+            logger.error('Runtime Error in Filter:'+error_message)
+            error = True
         finally:
             stdout_dump=sys.stdout.getvalue()
             sys.stdout=old_stdout
@@ -126,7 +128,7 @@ class filter_bank:
         logger.debug('env_keys='+str(self.env.keys()))
         logger.debug('stdout='+stdout_dump)
 
-        if self.env.has_key('out'):
+        if self.env.has_key('out') and not error:
             return True,self.env.pop('out'),stdout_dump
         else:
             return False,error_message,stdout_dump
