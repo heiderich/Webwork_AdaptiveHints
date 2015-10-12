@@ -3,6 +3,7 @@ This module is responsible for managing and executing the filters used in the ad
 """
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 import sys
 import glob
