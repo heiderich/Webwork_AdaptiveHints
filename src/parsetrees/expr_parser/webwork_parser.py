@@ -11,8 +11,8 @@ from webwork_lexer import WebworkLexer
 import logging
 
 logging.basicConfig(
-#    level = logging.DEBUG,
-    level = logging.WARNING,
+#    level = logging.WARNING,
+    level = logging.INFO,
     format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 log=logging.getLogger(__name__)
@@ -295,7 +295,8 @@ def parse_webwork(expr):
     parsed = handle_comma_separated_number(expr)
     if parsed is None: #didn't match comma_separated_number, so parse expr
         try:
-            parsed = parser.parse(expr,tracking=True,debug=log, lexer=lexer.lexer)
+            #parsed = parser.parse(expr,tracking=True,debug=log, lexer=lexer.lexer)
+            parsed = parser.parse(expr,tracking=True, lexer=lexer.lexer)
             final_range=fix_ranges(parsed)
             #print 'final_range=',final_range
         except  WebworkParseException as e:
