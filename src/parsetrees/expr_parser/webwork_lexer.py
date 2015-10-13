@@ -4,12 +4,13 @@ import ply.lex as lex
 
 class WebworkLexer(object):
     tokens = (
-    'Q', 'CHOOSE', 'VARIABLE', 'NUMBER', 'PLUS','MINUS','TIMES','DIVIDE', 'LPAREN','RPAREN','FACTORIAL', 'LSET', 'RSET','COMMA','EXP', 'LBRACKET', 'RBRACKET'
+    'Q', 'CHOOSE', 'PERMUTE', 'VARIABLE', 'NUMBER', 'PLUS','MINUS','TIMES','DIVIDE', 'LPAREN','RPAREN','FACTORIAL', 'LSET', 'RSET','COMMA','EXP', 'LBRACKET', 'RBRACKET'
     )
 
     # Tokens
     t_Q         = r'Q'
     t_CHOOSE    = r'C'
+    t_PERMUTE   = r'P'
     t_PLUS      = r'\+'
     t_MINUS     = r'-'
     t_FACTORIAL = r'!'
@@ -23,7 +24,7 @@ class WebworkLexer(object):
     t_LSET      = r'\{'
     t_RSET      = r'\}'
     t_COMMA     = r'\,'
-    t_VARIABLE  = r'\$?[A-BD-PR-Za-z_]+[0-9]*'
+    t_VARIABLE  = r'\$[A-Za-z_]+[0-9]*'  # not sure why $ was optional, caused all kind of troube.
 
     def t_NUMBER(self, t):
         r'\d*\.?\d+(E(\+|\-)?\d+)?'
