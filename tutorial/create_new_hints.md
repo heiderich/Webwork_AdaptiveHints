@@ -6,16 +6,16 @@
 
 3. In the filter function section, type in a filter name (e.g.'test') and click 'Generate Filter Template'. You should see something like this:
 
-```python
-def C_WeekX_XX_X_test(params):
-  """ Written by wej001 Tue Oct 13 2015 11:07:27 GMT-0700 (Pacific Sommerzeit)
-  <Filter Description goes here>
-  """
-  # params = {'attempt': '', 'att_tree': [], 'answer': '', 'ans_tree': [], 'variables': [{'name':,'value':}]} 
-  import json
-  print json.dumps(params)
-  return ''
-```
+  ```python
+  def C_WeekX_XX_X_test(params):
+    """ Written by wej001 Tue Oct 13 2015 11:07:27 GMT-0700 (Pacific Sommerzeit)
+    <Filter Description goes here>
+    """
+    # params = {'attempt': '', 'att_tree': [], 'answer': '', 'ans_tree': [], 'variables': [{'name':,'value':}]} 
+    import json
+    print json.dumps(params)
+    return ''
+  ```
 
 4. Click the button 'Run Filter' and you should be able to see all the attempts that have been made in the Filter Output window below.
 
