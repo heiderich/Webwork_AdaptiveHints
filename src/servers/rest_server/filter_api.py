@@ -229,8 +229,8 @@ class ApplyFilterFunctions(ProcessQuery):
             if var in part_answer:
                 part_answer = part_answer.replace(var, str(user_variables[var]))
         
-        answer_ptree, answer_etree = parse_and_eval(part_answer, user_variables)
-        ptree, etree = parse_and_eval(answer_string)
+        answer_etree = parse_and_eval(part_answer)
+        etree = parse_and_eval(answer_string)
         answer_data = {'attempt': answer_string, 'att_tree': etree, 'answer': part_answer,
                         'ans_tree': answer_etree, 'variables': user_variables}
         logger.debug(answer_data)
@@ -282,11 +282,15 @@ class ApplyFilterFunctions(ProcessQuery):
 
         txt = ""
         correct_set_problem_part = str(set_id) + "_" + str(problem_id) + "_" + str(part_id)
+
+        logger.info(user_id)
         success = False        
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
             #    continue
+            logger.info("checking conditional")
             if correct_set_problem_part in func['name']:
+                logger.info(func['name'])
                 success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
                 #TODO: remove the length check when things become reliable
                 if txt != "" and success and len(txt) < 100:
@@ -294,8 +298,10 @@ class ApplyFilterFunctions(ProcessQuery):
                 else:
                     success = False
         if not success:
+            logger.info("checking universal")
             for func in uni_filter_funcs:
                 if correct_set_problem_part in func['name']:
+                    logger.info(func['name'])
                     success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                     #TODO: remove the length check when things become reliable
                     if txt != "" and success and len(txt) < 100:
@@ -315,10 +321,14 @@ class ApplyFilterFunctions(ProcessQuery):
             ORDER BY timestamp DESC LIMIT 1;'''
                                        .format(course=course, WHERE=self.where_clause('set_id', 'problem_id', 'part_id', 'user_id'))).get('timestamp')
                 diff = last_answer-first_answer
+                logger.info('diff and count')
+                logger.info(diff)
+                logger.info(answer_count)
                 if answer_count > 3 and diff > timedelta(minutes=3):
-                    logger.info("sending")
+                    logger.info("sending time based")
                     for func in time_filter_funcs:
                         if correct_set_problem_part in func['name']:
+                            logger.info(func['name'])
                             success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                             #TODO: remove the length check when things become reliable
                             if txt != "" and success and len(txt) < 100:
@@ -326,7 +336,7 @@ class ApplyFilterFunctions(ProcessQuery):
                             else:
                                 success = False
             except Exception, e:
-                logger.warn('Error: ' + e)
+                logger.warn('Error: ' + str(e))
                 self.write(json.dumps({}))
                 return
             # Get any hints already assigned to user
@@ -345,6 +355,7 @@ class ApplyFilterFunctions(ProcessQuery):
 
         # Send hint with 50% chance
         send = bool(random.getrandbits(1))
+        logger.info("sent confirm: ", str(send))
 
         ret = {}
         ret['hint_html'] = txt

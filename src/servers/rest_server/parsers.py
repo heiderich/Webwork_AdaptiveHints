@@ -13,7 +13,7 @@ import tornado.web
 import json
 from datetime import datetime
 from webwork_parser import parse_webwork
-from Eval_parsed import parse_and_eval,eval_parsed, Collect_numbers, numbers_and_exps
+from parsetrees.expr_parser.Eval_parsed import parse_and_eval, eval_parsed, Collect_numbers, numbers_and_exps
 from webwork import serialize_datetime
 from collections import defaultdict
 import pandas as pd
@@ -28,30 +28,31 @@ from filter_bank import filter_bank
 
 import logging
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-# def parsed(string):
-#     expr = parse_webwork(string)
-#     if expr:
-#         try:
-#             etree = eval_parsed(expr)
-#             nums = Collect_numbers(etree)
-#             return etree, nums
-#         except:
-#             return (None, None)
-#     else:
-#         return (None, None)
+def parsed(string):
+    expr = parse_webwork(string)
+    if expr:
+        try:
+            etree = eval_parsed(expr)
+            nums = Collect_numbers(etree)
+            return etree, nums
+        except:
+            return (None, None)
+    else:
+        return (None, None)
 
-# def parse_eval(string):
-#     """ Given an expression, return it's parse tree and it's evaluation tree """
-#     expr = parse_webwork(string)
-#     if expr:
-#         try:
-#             etree = eval_parsed(expr)
-#             return expr, etree
-#         except:
-#             return (None, None)
-#     else:
-#         return (None, None)
+def parse_eval(string):
+    """ Given an expression, return it's parse tree and it's evaluation tree """
+    expr = parse_webwork(string)
+    if expr:
+        try:
+            etree = eval_parsed(expr)
+            return expr, etree
+        except:
+            return (None, None)
+    else:
+        return (None, None)
 
 def part_id_to_box(part_id):
     return "AnSwEr{part:04d}".format(part=int(part_id))
@@ -255,7 +256,9 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
         user_variables = conn.query('''SELECT * from {course}_user_variables
         WHERE set_id="{set_id}" AND problem_id = {problem_id};
         '''.format(course=course, set_id=set_id, problem_id=problem_id))
+        logger.info("ZHEN_DEBUGING", user_variables)
         self.variables_df = pd.DataFrame(user_variables)
+        logger.info("ZHEN_DEBUGING", self.variables_df)
         logger.debug('computing user vars. user_variables=%s, self_variables_df=%s'%(str(user_variables),str(self.variables_df)))
         if len(self.variables_df) == 0:
             logger.warn("No user variables saved for assignment %s, please run the save_answers script", set_id)
@@ -310,7 +313,7 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
                     self.part_answer = self.part_answer.replace(key, str(student_vars[key]))
             # Get the correct answer and generate an etree for it.
             self.answer_etree = parse_and_eval(self.part_answer)
-            ans = self.answer_for_student(user_id)
+            #ans = self.answer_for_student(user_id)
             if etree:
                 status,hint,output=a_filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':student_vars})
                 if status:
@@ -320,7 +323,7 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
                 else:
                     logger.debug('exec_filter failed attempt=%s,error=%s output=%s'%(attempt,hint,output))
             else:
-                logger.debug('filed to parse attempt=%s, ptree=%s, etree=%s'%(attempt,str(ptree),str(etree)))
+                logger.debug('filed to parse attempt=%s, etree=%s'%(attempt,str(etree)))
                 
         out = {
             'output':  _stdout,
