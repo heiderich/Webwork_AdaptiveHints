@@ -4,7 +4,7 @@
 
 2. In webwork, click on one problem part that you would like to create hints for.
 
-3. In the filter function section, type in a filter name (e.g.'test') and click 'Generate Filter Template'. You should see something like this:
+3. In the Filter Function section, type in a filter name (e.g.'test') and click 'Generate Filter Template'. You should see something like this:
 
   ```python
   def C_WeekX_XX_X_test(params):
@@ -23,4 +23,7 @@
 
 6. You can analyze these attempts by running ``FindMatchingSubexpressions.py`` on the saved text file.
 
-7. Once you run the script, you will see an output of what subexpressions of the students answers match with the right answer and how many attempts there were for each matching subexpression. Based on these subexpressions you can write conditional hints.
+7. Once you run the script, you will see an output of what subexpressions of the students answers match with the right answer and how many attempts there were for each matching subexpression. Based on these subexpressions you can write conditional hints. For example, if many students didn't get the solution, but typed in the subexpression ``C(26,2)`` that is part of the right answer, you could let them know that this part is correct.
+
+8. Now you can go back to the Filter Function interface on webwork and write a hint based on this condition.
+
