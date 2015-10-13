@@ -7,7 +7,7 @@ import paramiko
 #these parameters need to be set for each TA
 IP = "webwork.cse.ucsd.edu"
 USERNAME = "yfreund"
-set_id='Week2'
+set_id='Week3'
 ssh_private_key='/Users/yoavfreund/.ssh/id_dsa'
 
 def get_table(set_id):

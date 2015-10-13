@@ -24,11 +24,19 @@ def is_number(s):
 
 
 def ncr(n, r):
+    " compute n choose r "
     r = min(r, n-r)
     if r == 0: return 1
     numer = reduce(op.mul, xrange(n, n-r, -1))
     denom = reduce(op.mul, xrange(1, r+1))
     return numer/denom
+
+def npr(n, r):
+    " Computer n permute r (order matters)"
+    r = min(r, n-r)
+    if r == 0: return 1
+    numer = reduce(op.mul, xrange(n, n-r, -1))
+    return numer
 
 def find_common_values(e1,e2):
     """ Find intersection of values in two eval trees.
@@ -100,6 +108,8 @@ def eval_parsed(e, label='R'):
             elif f=='^': ans= v1**v2
             elif f=='C':
                 ans= ncr(int(v1), int(v2))
+            elif f=='P':
+                ans= npr(int(v1), int(v2))
             else:
                 raise Exception('unrecognized binary operator %s in %s'%(f,e))
             return_value=[[f,ans,span,label],ev1,ev2]

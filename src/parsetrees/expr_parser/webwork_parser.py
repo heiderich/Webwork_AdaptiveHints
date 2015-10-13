@@ -126,6 +126,7 @@ precedence = (
     ('left','EXP'),
     ('left','FACTORIAL'),
     ('nonassoc','CHOOSE'),
+    ('nonassoc','PERMUTE'),
     ('nonassoc','Q')
     )
 
@@ -182,8 +183,13 @@ def p_expression_factorial(t):
 def p_expression_choose(t):
     'factor : CHOOSE LPAREN list RPAREN %prec CHOOSE'
     list=flatten_list(t[3][1:])
-    #print 'p_expression_choose', list
     t[0] = ['C',list[0],list[1]]
+    t[0]=add_header(t)
+
+def p_expression_permute(t):
+    'factor : PERMUTE LPAREN list RPAREN %prec PERMUTE'
+    list=flatten_list(t[3][1:])
+    t[0] = ['P',list[0],list[1]]
     t[0]=add_header(t)
 
 def p_factor_q(t):
@@ -215,6 +221,13 @@ def p_expression_unbalanced_group(t):
 def p_expression_unclosed_choose(t):
     'factor : CHOOSE LPAREN list'
     print "Parse Error: Unclosed Choose"
+    print t.lexer.lexdata
+    print ' '*(t.lexpos(0))+'^'
+    raise WebworkParseException('Unbalanced parentheses in expression: ' + t.lexer.lexdata)
+
+def p_expression_unclosed_permute(t):
+    'factor : PERMUTE LPAREN list'
+    print "Parse Error: Unclosed PERMUTE"
     print t.lexer.lexdata
     print ' '*(t.lexpos(0))+'^'
     raise WebworkParseException('Unbalanced parentheses in expression: ' + t.lexer.lexdata)
@@ -282,9 +295,9 @@ def p_error(p):
 #     yacc.token()
 
 # START lex and yacc
-lexer = WebworkLexer()
+lexer = WebworkLexer(debug=True)
 tokens = lexer.tokens
-parser = yacc.yacc()
+parser = yacc.yacc(debug=True)
 
 # set up debugging.
 

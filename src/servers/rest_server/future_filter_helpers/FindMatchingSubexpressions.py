@@ -1,5 +1,5 @@
 """
-This function find_matches takes as input two parsed and evaluated trees, one for the correct answer and one for the attempt.
+The function find_matches takes as input two parsed and evaluated trees, one for the correct answer and one for the attempt.
 It finds the subexpressions that match between the correct and the attempt and returns it as a list of 
 tuples of the form (node,value,answer_part,attempt_part)
 
@@ -41,7 +41,7 @@ def flatten(tree,tag):
             current=Queue.popleft()
             logger.debug('current='+str(current)+' Queue='+str(Queue))
             if type(current)==list: 
-                if type(current[0])==str:
+                if isinstance(current[0],basestring):
                     List.append([current[1],tag,current])
                 elif isinstance(current[0][0],basestring) and isinstance(current[0][1],(int, long, float, complex)) and type(current[0][2])==list:
                     List.append([current[0][1],tag,current])
@@ -123,14 +123,16 @@ def find_dominating_hits(Hits,answer,attempt):
 def find_matches(params):
 
     attempt=params['attempt']
+    logger.debug( 'attempt: '+str(attempt))
     attempt_tree=params['att_tree']
-    logger.debug('calling flattenon'+str(attempt_tree))
+    logger.debug('calling flatten on '+str(attempt_tree))
     attempt_list=flatten(attempt_tree,'t')
     logger.debug( 'attempt list:\n'+str(attempt_list))
     
     answer=params['answer']
+    logger.debug( 'answer: '+str(answer))
     answer_tree=params['ans_tree']
-    logger.debug('calling flatten on'+str(answer_tree))
+    logger.debug('calling flatten on '+str(answer_tree))
     answer_list=flatten(answer_tree,'c')
     logger.debug('answer list\n'+str(answer_list))
 
@@ -158,14 +160,24 @@ if __name__=="__main__":
 
     elif len(sys.argv)==2: # param is the name of a file containing a dump of attempts with their parse trees and variables
         file=open(sys.argv[1],'r')
-        #print file.readline()
-        #params=json.loads(file.readline())
+        print file.readline()
+        print file.readline()
 
         Clusters=Counter()
         Reps={}
+        i=1
         for line in file.readlines():
+            i+=1
+            if len(line)>1000:
+                print 'long line error in line',i
+                continue
+            print line,
             params=json.loads(line)
+            print 'params=',params
             params['attempt'] = ''.join(params['attempt'].split()) # remove whitespaces
+            if params['ans_tree']==None:
+                print '-'*50,'error parsing answer'
+                params['ans_tree']=parse_and_eval(params['answer'])
             final_pairs=find_matches(params)
             if len(final_pairs)>0:
                 for node,value,ans_piece,attempt_piece in final_pairs:
@@ -179,8 +191,6 @@ if __name__=="__main__":
                             sub_type='answer'
                         else:
                             sub_type='sub-expression'
-                        print '-'*50
-                        print 'attempt=',attempt,'answer=',answer
                         if attempt_piece != ans_piece:
                             print 'The %s %s is correct, it could also be written as %s'%(sub_type,attempt_piece,ans_piece)
                         else:
