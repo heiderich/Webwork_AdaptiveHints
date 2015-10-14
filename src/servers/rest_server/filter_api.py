@@ -26,7 +26,8 @@ from StringIO import StringIO
 from parsers import parse_eval
 from pg_utils import get_source, get_part_answer
 from webwork_utils import get_user_vars, vars_for_student, answer_for_student
-from exec_filters import filtered_answers
+#from exec_filters import filtered_answers
+from exec_filters import replace_variables, load_filters_from_folder
 from filter_bank import filter_bank
 from pg_wrapper import render_pg_xmlrpc
 tz = tzlocal()
@@ -224,10 +225,7 @@ class ApplyFilterFunctions(ProcessQuery):
         '''.format(course=course, set_id=set_id, problem_id=problem_id, user_id=user_id))
 
         user_variables = {row['name']: row['value'] for row in user_variables}
-        # Replace variable with values
-        for var in user_variables:
-            if var in part_answer:
-                part_answer = part_answer.replace(var, str(user_variables[var]))
+        part_answer = replace_variables(user_variables, part_answer)
         
         answer_etree = parse_and_eval(part_answer)
         etree = parse_and_eval(answer_string)
@@ -261,30 +259,14 @@ class ApplyFilterFunctions(ProcessQuery):
         #logger.debug('Filters: %s', filter_funcs)
 
         # load from folder
-        files = self.filter_bank.get_env_keys()
-        con_filter_funcs = []
-        uni_filter_funcs = []
-        time_filter_funcs = []
-        for f in files:
-            ### remove the doc string from code ###
-            #code = self.filter_bank.get_code(self.filters_dir, f)
-            #while '\"\"\"' in code:
-            #    code = code[code.index('\"\"\"')+3:]
-            if f[0] == "C":
-                code = self.filter_bank.get_code(self.filters_dir, f)
-                con_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
-            elif f[0] == "U":
-                code = self.filter_bank.get_code(self.filters_dir, f)
-                uni_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
-            elif f[0] == "T":
-                code = self.filter_bank.get_code(self.filters_dir, f)
-                time_filter_funcs += [{'name': f, 'code': code, 'doc': self.filter_bank.get_docstring(f)}]
+        con_filter_funcs, uni_filter_funcs, time_filter_funcs = load_filters_from_folder(self.filter_bank, self.filters_dir)
 
         txt = ""
         correct_set_problem_part = str(set_id) + "_" + str(problem_id) + "_" + str(part_id)
 
         logger.info(user_id)
-        success = False        
+        success = False
+
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
             #    continue
@@ -339,19 +321,19 @@ class ApplyFilterFunctions(ProcessQuery):
                 logger.warn('Error: ' + str(e))
                 self.write(json.dumps({}))
                 return
-            # Get any hints already assigned to user
-            # hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
-            #                            .format(course=course,
-            #                                    WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
-            #                                    part_id=part_id))
-            # hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
-            
+
         #handle the case where none of the condition apply
         if not success:
             txt = ""
             logger.info("no match hint")
         else:
             logger.info("matched hint %s", txt)
+            # Get any hints already assigned to user
+            # hints_assigned = conn.query('''SELECT hint_id from {course}_assigned_hint {WHERE} AND pg_id='AnSwEr{part_id:04d}';'''
+            #                            .format(course=course,
+            #                                    WHERE=self.where_clause('set_id', 'problem_id', 'user_id'),
+            #                                    part_id=part_id))
+            # hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
 
         # Send hint with 50% chance
         send = bool(random.getrandbits(1))
@@ -364,26 +346,6 @@ class ApplyFilterFunctions(ProcessQuery):
         ret['assigned'] = int(send)
         self.write(json.dumps(ret))
 
-    # def exec_filter_func(self, code, answer_data, user_variables):
-    #     parent, child = Pipe()
-    #     p = Process(target=apply_filter, args=(answer_data, user_variables, code, child))
-    #     p.start()
-    #     # TODO Can we do this without blocking the process?
-    #     p.join(timeout=15)
-    #     if p.is_alive():
-    #         logger.warn("Function took too long, we killed it.")
-    #         p.terminate()
-    #         #ret[func.hint_id] = None
-    #         return ""
-    #     else:
-    #         result = parent.recv()
-    #         logger.debug("Got this back: %s", result)
-    #         if type(result) == str:
-    #             #ret[func.hint_id] = result
-    #             return result
-    #         else:
-    #             #ret[func.hint_id] = None
-    #             return ""
 
 class AssignedFilterFunctions(ProcessQuery):
     def get(self):
