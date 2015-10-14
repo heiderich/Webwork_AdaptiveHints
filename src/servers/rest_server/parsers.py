@@ -22,6 +22,7 @@ import re
 from auth import require_auth
 from multiprocessing import Process, Pipe, Queue, current_process
 #from exec_filters import filtered_answers
+from exec_filters import replace_variables
 from pg_utils import get_source, get_part_answer
 
 from filter_bank import filter_bank
@@ -314,17 +315,13 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
             user_id = a['user_id']
             attempt=a['answer_string']
             etree = parse_and_eval(attempt)
-            student_vars = self.user_variables
+            self.part_answer = replace_variables(self.user_variables, self.part_answer)
             
-            # Replace variable with values
-            for key in student_vars:
-                if key in self.part_answer:
-                    self.part_answer = self.part_answer.replace(key, str(student_vars[key]))
             # Get the correct answer and generate an etree for it.
             self.answer_etree = parse_and_eval(self.part_answer)
             #ans = self.answer_for_student(user_id)
             if etree:
-                status,hint,output=self.filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':student_vars})
+                status,hint,output=self.filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':self.user_variables})
                 if status:
                     logger.debug('exec_filter succeeded, attempt=%s,hint=%s,output=%s'%(attempt,hint,output))
                     _hints.append(hint)
