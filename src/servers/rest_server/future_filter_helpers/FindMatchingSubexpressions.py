@@ -153,7 +153,7 @@ if __name__=="__main__":
         params['attempt']=sys.argv[2]
         params['ans_tree']=parse_and_eval(params['answer'])
         params['att_tree']=parse_and_eval(params['attempt'])
-        print 'params=',params
+        #print 'params=',params
         final_pairs=find_matches(params)
         for item in final_pairs:
             print "node=%s, value=%s, The piece %s in your answer is correct, it can also be expressed as %s"%(item[0],item[1],item[3],item[2])
@@ -171,12 +171,12 @@ if __name__=="__main__":
             if len(line)>1000:
                 print 'long line error in line',i
                 continue
-            print line,
+            #print line,
             params=json.loads(line)
-            print 'params=',params
+            #print 'params=',params
             params['attempt'] = ''.join(params['attempt'].split()) # remove whitespaces
             if params['ans_tree']==None:
-                print '-'*50,'error parsing answer'
+                #print '-'*50,'error parsing answer'
                 params['ans_tree']=parse_and_eval(params['answer'])
             final_pairs=find_matches(params)
             if len(final_pairs)>0:
