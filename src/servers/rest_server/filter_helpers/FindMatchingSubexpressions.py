@@ -9,10 +9,7 @@ import sys
 from collections import deque
 from string import strip, replace
 import json
-from collections import Counter
 
-sys.path.append('../../..')
-from parsetrees.expr_parser.Eval_parsed import parse_and_eval
 #from webwork_parser import parse_webwork
 
 # Set up a logging object
@@ -147,6 +144,10 @@ def find_matches(params):
     return final_matches
 
 if __name__=="__main__":
+    sys.path.append('../../..')
+    from parsetrees.expr_parser.Eval_parsed import parse_and_eval
+    from collections import Counter
+
     if len(sys.argv)==3:   #parameters are two expressions
         params={}
         params['answer']=sys.argv[1]
