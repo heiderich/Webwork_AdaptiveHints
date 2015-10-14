@@ -221,6 +221,15 @@ class GroupedPartAnswers(JSONRequestHandler, tornado.web.RequestHandler):
 # GET /filter_answers?
 class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
     """ Run when user clicks "run filter" """
+    def load_filters(self):
+        self.filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filters_path = os.path.join(basepath, "filters/")
+        filter_helpers_path = os.path.join(basepath, "filter_helpers/")
+        self.filter_bank.import_filters_from_files(filters_path)
+        self.filter_bank.import_filters_from_files(filter_helpers_path)
+        self.filters_dir = filters_path
+
     def vars_for_student(self, user_id):
         try:
             user_vars = dict(self.variables_df[self.variables_df['user_id']==user_id][['name', 'value']].values.tolist())
@@ -288,15 +297,19 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
         answers = conn.query(query)
         logger.debug('after sending sql query')
 
-        a_filter_bank=filter_bank()
+        self.load_filters()
+
         func_name = filter_function[4:filter_function.index('(')]
-        status=a_filter_bank.add_filter(func_name,filter_function)
+        status=self.filter_bank.add_filter(func_name,filter_function)
         if status!=None:
             print "ERROR LOADING FUNCTION"+status
             return status
 
         _stdout=''
         _hints=[]
+
+        logger.warn("Environment keys before parsers.py main loop " , self.filter_bank.get_env_keys())
+        
         for a in answers:
             user_id = a['user_id']
             attempt=a['answer_string']
@@ -311,7 +324,7 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
             self.answer_etree = parse_and_eval(self.part_answer)
             #ans = self.answer_for_student(user_id)
             if etree:
-                status,hint,output=a_filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':student_vars})
+                status,hint,output=self.filter_bank.exec_filter(func_name,{'attempt':attempt, 'att_tree':etree, 'answer': self.part_answer, 'ans_tree':self.answer_etree, 'variables':student_vars})
                 if status:
                     logger.debug('exec_filter succeeded, attempt=%s,hint=%s,output=%s'%(attempt,hint,output))
                     _hints.append(hint)
