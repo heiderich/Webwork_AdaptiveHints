@@ -54,7 +54,7 @@ def eval_parsed(e, label='R'):
     
         Still need to write code to handle varibles, lists and sets.
     """
-    print 'in eval_parsed e=|%s|, label=|%s|'%(str(e),str(label))
+    #print 'in eval_parsed e=|%s|, label=|%s|'%(str(e),str(label))
 
     def get_number(ev):
         #print 'get_number got',ev
