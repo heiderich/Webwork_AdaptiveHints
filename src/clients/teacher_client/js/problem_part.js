@@ -483,8 +483,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 var filter_output_for_download = set_id + " Problem" + problem_id + " Part" + part_id + "\n" 
                     + $scope.answer_expression + "\n" + $scope.filter_output;
                 var downloadFilterOutputLinkElement = $("#downloadFilterDataLink");
-                downloadFilterOutputLinkElement[0].href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(filter_output_for_download);
                 downloadFilterOutputLinkElement[0].download = course + "_" + set_id + "_problem" + problem_id + "_part" + part_id + ".txt";
+                var textBlob = new Blob([filter_output_for_download], {type: 'text/plain'});
+                downloadFilterOutputLinkElement[0].href = window.URL.createObjectURL(textBlob);
                 downloadFilterOutputLinkElement.removeClass("hidden");
             }).error(function(error){
                 console.error(error);
