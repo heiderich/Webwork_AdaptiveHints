@@ -12,7 +12,7 @@ def get_table():
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(IP, username=USERNAME, key_filename=ssh_private_key)
     
-    command = """mysql -u readonly -preadonly webwork -e 'select * from 		CSE103_Fall2015_assigned_hint;'
+    command = """mysql -u readonly -preadonly webwork -e 'select * from CSE103_Fall2015_assigned_hint;'
     """
 
     ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(command)
