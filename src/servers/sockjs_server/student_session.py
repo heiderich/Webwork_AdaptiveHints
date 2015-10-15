@@ -238,7 +238,7 @@ class StudentSession(object):
         #hint_html_template = HintRestAPI.render_html_assign_hint(self.student_id, self.course_id, self.set_id, self.problem_id,
         #    0, 0, hint['hint_html'])
         HintRestAPI.assign_hint(self.student_id, self.course_id, self.set_id, self.problem_id,
-            hint['location'], 0, hint['hint_html'], hint['assigned'])
+            hint['location'], 0, hint['hint_html'], hint['assigned'], answer_string, hint['filter_name'])
         return hint
 
 

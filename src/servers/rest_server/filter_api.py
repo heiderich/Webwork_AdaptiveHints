@@ -266,6 +266,7 @@ class ApplyFilterFunctions(ProcessQuery):
 
         logger.info(user_id)
         success = False
+        filter_function_name = ""
 
         for func in con_filter_funcs:
             #if func.hint_id in hints_assigned:
@@ -276,6 +277,7 @@ class ApplyFilterFunctions(ProcessQuery):
                 success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data) #self.exec_filter_func(func['code'], answer_data, user_variables)
                 #TODO: remove the length check when things become reliable
                 if txt != "" and success and len(txt) < 100:
+                    filter_function_name = func['name']
                     break
                 else:
                     success = False
@@ -287,6 +289,7 @@ class ApplyFilterFunctions(ProcessQuery):
                     success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                     #TODO: remove the length check when things become reliable
                     if txt != "" and success and len(txt) < 100:
+                        filter_function_name = func['name']
                         break
                     else:
                         success = False
@@ -314,6 +317,7 @@ class ApplyFilterFunctions(ProcessQuery):
                             success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                             #TODO: remove the length check when things become reliable
                             if txt != "" and success and len(txt) < 100:
+                                filter_function_name = func['name']
                                 break
                             else:
                                 success = False
@@ -340,6 +344,7 @@ class ApplyFilterFunctions(ProcessQuery):
         logger.info("sent confirm: ", str(send))
 
         ret = {}
+        ret['filter_name'] = filter_function_name
         ret['hint_html'] = txt
         ret['location'] = "AnSwEr"+("0000"+str(part_id))[-4:]
         ret['hintbox_id'] = 0
