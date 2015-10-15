@@ -188,9 +188,10 @@ class AssignedHint(ProcessQuery):
 
             With return None '''
         query_template = '''insert into {{course}}_assigned_hint
-            (set_id, problem_id, pg_id, hint_id, user_id, hint_html, assigned) values
+            (set_id, problem_id, pg_id, hint_id, user_id, hint_html, assigned, student_answer, filter_name) values
             ("{{set_id}}", {{problem_id}},
-            "{{pg_id}}", "{{hint_id}}", "{{user_id}}", "{{hint_html_template}}", "{{assigned}}")
+            "{{pg_id}}", "{{hint_id}}", "{{user_id}}", "{{hint_html_template}}", "{{assigned}}", "{{student_answer}}",
+            "{{filter_name}}")
             '''
         self.process_query(query_template,
                            post_process=self.replace_hint_html_id,
