@@ -103,15 +103,13 @@
             <th>Filter Name</th>
             <th>Filter Description</th>
             <th>Filter Type</th>
-            <th>Author</th>
           </tr>
         </thead>
         <tbody>
           <tr ng-repeat="filter in filter_functions" dt-rows="" ng-click="show_filter_code(filter.code)">
             <td>{{filter.name}}</td>
-            <td>{{filter.code}}</td>
+            <td>{{filter.doc}}</td>
             <td>{{filter.type}}</td>
-            <td>{{filter.author}}</td>
           </tr>
         </tbody>
       </table>

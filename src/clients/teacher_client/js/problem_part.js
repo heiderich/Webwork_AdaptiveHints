@@ -60,6 +60,10 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             });
             $scope.answers = answersByPart[part_id];
     });
+    $scope.$on('event:dataTableLoaded', function(event, loadedDT) {
+        loadedDT.id == "filter_table" && loadedDT.DataTable && loadedDT.DataTable
+            .search($scope.set_id + "_" + $scope.problem_id + "_" + $scope.part_id + "_").draw();
+    });
 
 
     WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
@@ -507,6 +511,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     var loadfilters = function(){
         HintsService.getFilterFunctions().success(function(funcs){
+            angular.forEach(funcs, function(filter) {
+                filter.type = filter.name.indexOf("U") == 0 ? "Universal" : (filter.name.indexOf("C") == 0 ? "Conditional" : (filter.name.indexOf("T") == 0) ? "Time Based" : "")
+            });
             $("#filter_table").DataTable().destroy();
             $scope.filter_functions = funcs;
         });
