@@ -71,7 +71,6 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             $("#attempts_table").DataTable().destroy();
             $scope.answersByPartAllUsers = {};
             var temporaryMap = {};
-            var temporaryMap2 = {};
             angular.forEach(data, function(value){
                 if (value.part_id <= $scope.part_id) {
                     if (!temporaryMap[value.user_id]) {

@@ -16,7 +16,7 @@ App.config(
        $httpProvider.defaults.useXDomain = true;
        delete $httpProvider.defaults.headers.common['X-Requested-With'];
        $httpProvider.interceptors.push('authInterceptor');
-       $urlRouterProvider.otherwise('/courses/CSE103_Fall14');
+       $urlRouterProvider.otherwise('/courses/CSE103_Fall2015');
        $stateProvider.
        /*Parts and Courses were here in the same landing page.  Now only parts is shown in the landing page*/
        /*state('course', {
