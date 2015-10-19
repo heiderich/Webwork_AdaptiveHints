@@ -64,7 +64,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
         success(function(data){
-            $("#attempts_table").DataTable().destroy();  
+            $("#attempts_table").DataTable().destroy();
             $scope.answersByPartAllUsers = {};
             var temporaryMap = {};
             var temporaryMap2 = {};
@@ -507,6 +507,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     var loadfilters = function(){
         HintsService.getFilterFunctions().success(function(funcs){
+            $("#filter_table").DataTable().destroy();
             $scope.filter_functions = funcs;
         });
     };
