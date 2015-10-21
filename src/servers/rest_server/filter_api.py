@@ -284,15 +284,14 @@ class ApplyFilterFunctions(ProcessQuery):
         if not success:
             logger.info("checking universal")
             for func in uni_filter_funcs:
-                if correct_set_problem_part in func['name']:
-                    logger.info(func['name'])
-                    success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
-                    #TODO: remove the length check when things become reliable
-                    if txt != "" and success and len(txt) < 100:
-                        filter_function_name = func['name']
-                        break
-                    else:
-                        success = False
+                #logger.info(func['name'])
+                success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
+                #TODO: remove the length check when things become reliable
+                if txt != "" and success and len(txt) < 100:
+                    filter_function_name = func['name']
+                    break
+                else:
+                    success = False
         if not success:
             logger.info("checking timebased")
             # Only run filters if at least 3 answers and at least 3 minutes since first answer
