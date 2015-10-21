@@ -126,11 +126,13 @@ class HintRestAPI(object):
 
     @staticmethod
     def assign_hint(student_id, course_id, set_id,
-                    problem_id, location, hint_id, hint_html_template, assigned):
+                    problem_id, location, hint_id, hint_html_template,
+                    assigned, student_answer, filter_name):
         base_url = HintRestAPI._baseurl
         params = {'user_id':student_id, 'course':course_id,
                   'set_id':set_id, 'problem_id':problem_id, 'pg_id':location,
-                  'hint_id':hint_id, 'hint_html_template':hint_html_template, 'assigned':assigned}
+                  'hint_id':hint_id, 'hint_html_template':hint_html_template, 'assigned':assigned,
+                  'student_answer':student_answer, 'filter_name':filter_name}
         r = requests.post(base_url+'/assigned_hint', data=params)
 
     @staticmethod

@@ -60,14 +60,17 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             });
             $scope.answers = answersByPart[part_id];
     });
+    $scope.$on('event:dataTableLoaded', function(event, loadedDT) {
+        loadedDT.id == "filter_table" && loadedDT.DataTable && loadedDT.DataTable
+            .search($scope.set_id + "_" + $scope.problem_id + "_" + $scope.part_id + "_").draw();
+    });
 
 
     WebworkService.answersByPartAllUsers(course, set_id, problem_id, user_id).
         success(function(data){
-            $("#attempts_table").DataTable().destroy();  
+            $("#attempts_table").DataTable().destroy();
             $scope.answersByPartAllUsers = {};
             var temporaryMap = {};
-            var temporaryMap2 = {};
             angular.forEach(data, function(value){
                 if (value.part_id <= $scope.part_id) {
                     if (!temporaryMap[value.user_id]) {
@@ -483,8 +486,9 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 var filter_output_for_download = set_id + " Problem" + problem_id + " Part" + part_id + "\n" 
                     + $scope.answer_expression + "\n" + $scope.filter_output;
                 var downloadFilterOutputLinkElement = $("#downloadFilterDataLink");
-                downloadFilterOutputLinkElement[0].href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(filter_output_for_download);
                 downloadFilterOutputLinkElement[0].download = course + "_" + set_id + "_problem" + problem_id + "_part" + part_id + ".txt";
+                var textBlob = new Blob([filter_output_for_download], {type: 'text/plain'});
+                downloadFilterOutputLinkElement[0].href = window.URL.createObjectURL(textBlob);
                 downloadFilterOutputLinkElement.removeClass("hidden");
             }).error(function(error){
                 console.error(error);
@@ -506,6 +510,10 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     var loadfilters = function(){
         HintsService.getFilterFunctions().success(function(funcs){
+            angular.forEach(funcs, function(filter) {
+                filter.type = filter.name.indexOf("U") == 0 ? "Universal" : (filter.name.indexOf("C") == 0 ? "Conditional" : (filter.name.indexOf("T") == 0) ? "Time Based" : "")
+            });
+            $("#filter_table").DataTable().destroy();
             $scope.filter_functions = funcs;
         });
     };
