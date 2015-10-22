@@ -339,8 +339,13 @@ class ApplyFilterFunctions(ProcessQuery):
             # hints_assigned = set([hint['hint_id'] for hint in hints_assigned])
 
         # Send hint with 50% chance
-        send = bool(random.getrandbits(1))
-        logger.info("sent confirm: ", str(send))
+        logger.info(course)
+        logger.info(user_id)
+        send_int = conn.query('''SELECT hint from {course}_user WHERE user_id="{user_id}";'''
+                    .format(course=course, user_id=user_id))
+        send_int = int(send_int[0]['hint'])
+        send = bool(send_int)
+        logger.info("sent confirm: " + str(send))
 
         ret = {}
         ret['filter_name'] = filter_function_name
