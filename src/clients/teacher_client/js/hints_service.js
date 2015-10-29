@@ -100,7 +100,7 @@ App.factory('HintsService', function($http, $window, $rootScope, $location, $q, 
 
         getFilterFunctions: function(args){
             return $http
-                .get(BASE_URL+'/filter_functions',
+                .get(BASE_URL+'/filter_helpers',
                      {params: args});
         },
         assignFilterFunction: function(course, set_id, problem_id, part_id, filter_function_id, hint_id){

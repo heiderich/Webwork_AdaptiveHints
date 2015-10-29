@@ -387,3 +387,55 @@ class AssignedFilterFunctions(ProcessQuery):
         res = conn.execute(query)
 
         self.write(json.dumps(res))
+
+class FilterHelpers(ProcessQuery):
+    """ /filter_functions """
+
+    def set_default_headers(self):
+        # Allows X-site requests
+        super(ProcessQuery, self).set_default_headers()
+        self.add_header("Access-Control-Allow-Methods", "PUT,DELETE")
+        self.reload_filters()
+
+    def reload_filters(self):
+        self.filter_bank = filter_bank()
+        basepath = os.path.dirname(__file__)
+        filter_helpers_path = os.path.join(basepath, "filter_helpers/")
+        self.filter_bank.import_filters_from_files(filter_helpers_path)
+        self.filters_dir = filter_helpers_path
+
+
+    def filter_path(self, id):
+        ''' Helper method for generating file path to put filter functions. '''
+        args = self.filtered_arguments('course', 'set_id', 'problem_id', 'name').values() + [id]
+        logger.debug(args)
+        path = os.path.join(BASE, *args)
+        logger.debug(path)
+
+    def get(self):
+        ''' For loading filter functions
+
+            Sample arguments:
+            id="1",
+
+            Returning: [
+                {
+                    "id": 3, ...
+                },
+                ...
+            ]
+        '''
+
+        allowed_args = self.filtered_arguments('id', 'set_id', 'problem_id', 'name', 'author', 'course', 'function_type')
+        #where = self.where_clause(**allowed_args)
+        #query = '''select * from filter_functions {WHERE};'''.format(WHERE=where)
+        #logger.debug(query)
+        #rows = conn.query(query)
+        #self.write(json.dumps(rows, default=serialize_datetime))
+
+        # load from folder
+        files = self.filter_bank.get_env_keys()
+        functions = []
+        for f in files:
+            functions += [{'name': f}]
+        self.write(json.dumps(functions, default=serialize_datetime))
