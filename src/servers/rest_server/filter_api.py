@@ -389,7 +389,7 @@ class AssignedFilterFunctions(ProcessQuery):
         self.write(json.dumps(res))
 
 class FilterHelpers(ProcessQuery):
-    """ /filter_helpers """
+    """ /filter_functions """
 
     def set_default_headers(self):
         # Allows X-site requests
@@ -413,7 +413,25 @@ class FilterHelpers(ProcessQuery):
         logger.debug(path)
 
     def get(self):
+        ''' For loading filter functions
+
+            Sample arguments:
+            id="1",
+
+            Returning: [
+                {
+                    "id": 3, ...
+                },
+                ...
+            ]
+        '''
+
         allowed_args = self.filtered_arguments('id', 'set_id', 'problem_id', 'name', 'author', 'course', 'function_type')
+        #where = self.where_clause(**allowed_args)
+        #query = '''select * from filter_functions {WHERE};'''.format(WHERE=where)
+        #logger.debug(query)
+        #rows = conn.query(query)
+        #self.write(json.dumps(rows, default=serialize_datetime))
 
         # load from folder
         files = self.filter_bank.get_env_keys()
