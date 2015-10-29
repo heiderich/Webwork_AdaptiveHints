@@ -419,8 +419,5 @@ class FilterHelpers(ProcessQuery):
         files = self.filter_bank.get_env_keys()
         functions = []
         for f in files:
-            '''functions += [{'name': f, 'code': self.filter_bank.get_code(self.filters_dir, f), 'doc': self.filter_bank.get_docstring(f)}]
-            The above line fails, so I am printing only the name for now
-            '''
             functions += [{'name': f}]
         self.write(json.dumps(functions, default=serialize_datetime))
