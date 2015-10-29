@@ -1,12 +1,12 @@
 var App = angular.module('ta-console');
 
 App.value('APIPort', 4351);
-App.value('APIHost', '192.168.33.10');
+App.value('APIHost', 'webwork.cse.ucsd.edu');
 
 App.value('CurrentCourse', {name: 'Course'});
 
-App.value('user_id_for_problem_render', 'joemanley');
-App.value('password_for_problem_render', 'test');
+App.value('user_id_for_problem_render', 'pg_render');
+App.value('password_for_problem_render', 'pgrender');
 
 App.constant(
     'HintFilterProperties', {

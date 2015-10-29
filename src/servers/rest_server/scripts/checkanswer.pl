@@ -48,8 +48,8 @@ use URI::Escape;
 
 our ($XML_URL, $FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE, %credentials);
 
-$XML_URL         = 'http://192.168.33.10';
-$FORM_ACTION_URL = 'http://192.168.33.10/webwork2/html2xml';
+$XML_URL         = 'http://webwork.cse.ucsd.edu';
+$FORM_ACTION_URL = 'http://webwork.cse.ucsd.edu/webwork2/html2xml';
 $XML_PASSWORD    = 'xmlwebwork';
 $XML_COURSE      = 'nonexisting_course';
 
