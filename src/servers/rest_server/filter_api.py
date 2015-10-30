@@ -8,6 +8,7 @@ import tornado.web
 import logging
 import random
 import tempfile
+import glob
 
 from tornado.template import Template
 from convert_timestamp import utc_to_system_timestamp
@@ -397,11 +398,9 @@ class FilterHelpers(ProcessQuery):
         self.reload_filters()
 
     def reload_filters(self):
-        self.filter_bank = filter_bank()
         basepath = os.path.dirname(__file__)
         filter_helpers_path = os.path.join(basepath, "filter_helpers/")
-        self.filter_bank.import_filters_from_files(filter_helpers_path)
-        self.filters_dir = filter_helpers_path
+        self.filters_helpers_dir = filter_helpers_path
 
 
     def filter_path(self, id):
@@ -413,8 +412,18 @@ class FilterHelpers(ProcessQuery):
 
     def get(self):
         # load from folder
-        files = self.filter_bank.get_env_keys()
-        functions = []
-        for f in files:
-            functions += [{'name': f, 'code': self.filter_bank.get_code(self.filters_dir, f)}]
-        self.write(json.dumps(functions, default=serialize_datetime))
+        filter_helpers = []
+        for filename in glob.glob(self.filters_helpers_dir+'*.py'):
+            filter_helper_name=filename[len(self.filters_helpers_dir):-3]
+            if filter_helper_name[0] != '_':
+                #foo = __import__(filename[len(self.filters_helpers_dir)])
+                #mydocstring = foo.__doc__
+                code=open(filename,'r').read()
+                #getting doc_string from python file
+                co = compile(code, filename, 'exec')
+                if co.co_consts and isinstance(co.co_consts[0], basestring):
+                    docstring = co.co_consts[0]
+                else:
+                    docstring = None
+                filter_helpers += [{'name': filter_helper_name, 'code': code, 'doc': docstring}]
+        self.write(json.dumps(filter_helpers, default=serialize_datetime))

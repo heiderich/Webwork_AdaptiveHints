@@ -100,6 +100,11 @@ App.factory('HintsService', function($http, $window, $rootScope, $location, $q, 
 
         getFilterFunctions: function(args){
             return $http
+                .get(BASE_URL+'/filter_functions',
+                     {params: args});
+        },
+        getFilterHelpers: function(args){
+            return $http
                 .get(BASE_URL+'/filter_helpers',
                      {params: args});
         },
