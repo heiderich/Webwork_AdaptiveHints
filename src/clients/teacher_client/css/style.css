@@ -29,3 +29,6 @@
     display: block;
     position: relative;
 }
+.dataTables_wrapper {
+    overflow: auto;
+}

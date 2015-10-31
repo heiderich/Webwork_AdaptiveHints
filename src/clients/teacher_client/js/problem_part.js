@@ -633,5 +633,6 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.show_filter_code = function(filter_code) {
         $("#filter_code_read_only_container").removeClass("hidden");
         $("#filter_code_read_only").html(filter_code);
+        $("#filter_code_read_only_container")[0].scrollIntoView();
     }
 });
