@@ -29,7 +29,6 @@ from filter_bank import filter_bank
 
 import logging
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 def parsed(string):
     expr = parse_webwork(string)

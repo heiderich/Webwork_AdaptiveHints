@@ -241,10 +241,10 @@ class HintRestAPI(object):
             then send the rendered hint along with its location to the
             assign_hint API '''
         base_url = HintRestAPI._baseurl
-        pg_header = "DOCUMENT();\nloadMacros(\"PGstandard.pl\",\"PGunion.pl\",\"PGML.pl\",\"Parser.pl\",\"parserMultiAnswer.pl\",\"PGcourse.pl\",);BEGIN_PGML \n"
-        pg_footer = "\n END_PGML \n ENDDOCUMENT();"
-        # GET /hint
-        #r = requests.get(base_url+'/hint', params={'course':course,  'hint_id':hint_id}).json()
+        header_footer = requests.get(base_url+'/get_header_footer', params={'course':course,
+          'set_id':set_id, 'problem_id':problem_id}).json()
+        pg_header = header_footer['header']
+        pg_footer = header_footer['footer']
         if hint_PGML:
             pg_text = pg_header + hint_PGML + pg_footer
             #pg_text = '%s\n%s\n%s'%(r['pg_header'], hint_PGML, r['pg_footer'])
@@ -276,3 +276,4 @@ class HintRestAPI(object):
                   'set_id':set_id, 'problem_id':problem_id, 'pg_id':pg_id,
                   'hint_id':hint_id, 'hint_html_template':h}
         r = requests.post(base_url+'/assigned_hint', data=params)
+        return h
