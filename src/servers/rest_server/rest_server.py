@@ -12,7 +12,7 @@ from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
 from hints_api import (AssignedHint, AssignedHintFilter,
                        AssignedHintHistoryByHintID, AssignedHintHistoryByProblemPart, AssignedHintHistoryofProblem,
                       UserProblemHints)#, Hint, ProblemHints, HintFeedback, HintFilter, RunHintFilters)
-from filter_api import (FilterFunctions, ApplyFilterFunctions, AssignedFilterFunctions)
+from filter_api import (FilterFunctions, ApplyFilterFunctions, AssignedFilterFunctions, FilterHelpers)
 
 from auth import (Login)
 from parsers import ParseString, GroupedPartAnswers, FilterAnswers
@@ -77,6 +77,7 @@ if __name__ == "__main__":
         (r"/export_problem_data", ExportProblemData),
         (r"/filter_answers", FilterAnswers),
         (r"/filter_functions", FilterFunctions),
+        (r"/filter_helpers", FilterHelpers),
         (r"/assigned_filter_functions", AssignedFilterFunctions),
         (r"/answers_by_part_all_users", AnswersByPartAllUsers),
         (r"/user_problem_hints", UserProblemHints)

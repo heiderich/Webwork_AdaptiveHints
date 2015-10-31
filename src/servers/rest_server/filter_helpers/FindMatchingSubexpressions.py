@@ -144,7 +144,7 @@ def find_matches(params):
     return final_matches
 
 if __name__=="__main__":
-    sys.path.append('../../..')
+    sys.path.append('../src')
     from parsetrees.expr_parser.Eval_parsed import parse_and_eval
     from collections import Counter
 
