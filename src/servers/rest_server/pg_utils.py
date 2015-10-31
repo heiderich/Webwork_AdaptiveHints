@@ -1,8 +1,8 @@
 from process_query import conn
 from webwork_config import webwork_dir
+from get_header_footer import get_header, get_footer
 import re
 import os
-
 
 def get_source(course, set_id, problem_id):
     source_file = conn.query('''select source_file from {course}_problem
@@ -13,11 +13,19 @@ def get_source(course, set_id, problem_id):
         pg_file = fin.read()
         return pg_file
 
+def get_header_footer(course, set_id, problem_id):
+    pg_str = get_source(course, set_id, problem_id)
+    header = get_header(pg_str)
+    footer = get_footer(pg_str)
+    return header, footer
+
 
 def get_part_answer(pg_file, part_id):
     # Matches answers with Compute() and without in separate groups
     answer_re = re.compile('\[__+\]{(?:(?:Compute\(")(.+?)(?:"\))(?:.*)|(.+?))}')
     answer_boxes = answer_re.findall(pg_file)
+    logger.info("Zhen box")
+    logger.info(answer_boxes)
     if part_id <= len(answer_boxes):
         part_answer = answer_boxes[part_id-1][0] or answer_boxes[part_id-1][1]
     else:
