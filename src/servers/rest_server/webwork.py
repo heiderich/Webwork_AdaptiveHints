@@ -10,6 +10,7 @@ import simplejson as json
 from datetime import datetime
 from dateutil.tz import tzlocal
 from auth import require_auth
+from pg_utils import get_header_footer
 tz = tzlocal()
 
 import logging
@@ -465,4 +466,14 @@ class ProblemPartStatus(ProcessQuery):
         '''.format(course=course, set_id=set_id, problem_id=problem_id, part_id=part_id)
         result = conn.query(status_query)
         out = result[0]
+        self.write(json.dumps(out))
+
+# GET /pg_header_footer?
+class PgHeaderFooter(ProcessQuery):
+    def get(self):
+        course = self.get_argument('course')
+        set_id = self.get_argument('set_id')
+        problem_id = self.get_argument('problem_id')
+        header, footer = get_header_footer(course, set_id, problem_id)
+        out = {'header': header, 'footer': footer}
         self.write(json.dumps(out))
