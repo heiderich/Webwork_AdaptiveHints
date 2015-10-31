@@ -113,6 +113,21 @@
           </tr>
         </tbody>
       </table>
+      <h4>Filter Helpers Library</h4>
+      <table class="table" id="filter_helper_table" datatable="ng" dt-options="dtOptions2" dt-column-defs="dtColumnDefs2">
+        <thead>
+          <tr>
+            <th>Filter Helper Name</th>
+            <th>Filter Helper Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="filter in filter_helpers" dt-rows="" ng-click="show_filter_code(filter.code)">
+            <td>{{filter.name}}</td>
+            <td>{{filter.doc}}</td>
+          </tr>
+        </tbody>
+      </table>
       <div id="filter_code_read_only_container" class="hidden">
         <h5>Filter Code</h>
         <pre id="filter_code_read_only"></pre>
