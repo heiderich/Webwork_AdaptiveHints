@@ -8,6 +8,7 @@ import tornado.web
 import logging
 import random
 import tempfile
+import glob
 
 from tornado.template import Template
 from convert_timestamp import utc_to_system_timestamp
@@ -387,3 +388,42 @@ class AssignedFilterFunctions(ProcessQuery):
         res = conn.execute(query)
 
         self.write(json.dumps(res))
+
+class FilterHelpers(ProcessQuery):
+
+    def set_default_headers(self):
+        # Allows X-site requests
+        super(ProcessQuery, self).set_default_headers()
+        self.add_header("Access-Control-Allow-Methods", "PUT,DELETE")
+        self.reload_filters()
+
+    def reload_filters(self):
+        basepath = os.path.dirname(__file__)
+        filter_helpers_path = os.path.join(basepath, "filter_helpers/")
+        self.filters_helpers_dir = filter_helpers_path
+
+
+    def filter_path(self, id):
+        ''' Helper method for generating file path to put filter functions. '''
+        args = self.filtered_arguments('course', 'set_id', 'problem_id', 'name').values() + [id]
+        logger.debug(args)
+        path = os.path.join(BASE, *args)
+        logger.debug(path)
+
+    def get(self):
+        # load from folder
+        filter_helpers = []
+        for filename in glob.glob(self.filters_helpers_dir+'*.py'):
+            filter_helper_name=filename[len(self.filters_helpers_dir):-3]
+            if filter_helper_name[0] != '_':
+                #foo = __import__(filename[len(self.filters_helpers_dir)])
+                #mydocstring = foo.__doc__
+                code=open(filename,'r').read()
+                #getting doc_string from python file
+                co = compile(code, filename, 'exec')
+                if co.co_consts and isinstance(co.co_consts[0], basestring):
+                    docstring = co.co_consts[0]
+                else:
+                    docstring = None
+                filter_helpers += [{'name': filter_helper_name, 'code': code, 'doc': docstring}]
+        self.write(json.dumps(filter_helpers, default=serialize_datetime))

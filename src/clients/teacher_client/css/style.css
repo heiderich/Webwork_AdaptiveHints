@@ -32,3 +32,7 @@
 .dataTables_wrapper {
     overflow: auto;
 }
+#filter_code_read_only_container #filter_code_read_only {
+    overflow: auto;
+    max-height: 400px;
+}
