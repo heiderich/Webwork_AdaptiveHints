@@ -5,7 +5,7 @@ import argparse
 # Request handlers
 from render import Render
 from checkanswer import CheckAnswer
-from webwork import (ProblemSeed, ProblemPGPath, ProblemPGFile,
+from webwork import (PgHeaderFooter, ProblemSeed, ProblemPGPath, ProblemPGFile,
                      RealtimeUserProblemAnswers, RealtimeProblemAnswer,
                      SetIds, Sets, Problems, ExportProblemData, AnswersByPart,
                      ProblemStatus, ProblemPartStatus, SetPsvn, AnswersByPartAllUsers)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     # set up the root logger
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - '
                                   '%(levelname)s - %(message)s')
@@ -80,7 +80,8 @@ if __name__ == "__main__":
         (r"/filter_helpers", FilterHelpers),
         (r"/assigned_filter_functions", AssignedFilterFunctions),
         (r"/answers_by_part_all_users", AnswersByPartAllUsers),
-        (r"/user_problem_hints", UserProblemHints)
+        (r"/user_problem_hints", UserProblemHints),
+        (r"/get_header_footer", PgHeaderFooter)
         #(r"/hint", Hint),
         #(r"/problem_hints", ProblemHints),
         #(r"/hint_feedback", HintFeedback),
