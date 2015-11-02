@@ -63,7 +63,7 @@ class filter_bank:
             if replace:
                 old_filter=self.env.pop(name)
             else:
-                return 'Filter named: %s already exists, set "replace=True"'%name
+                return 'Filter named: %s already exists, the author of the function has to replace it'%name
 
         message='';
         try:
