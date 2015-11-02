@@ -86,11 +86,11 @@ App.factory('HintsService', function($http, $window, $rootScope, $location, $q, 
                 .get('http://'+APIHost+':4351/assigned_hint_history_of_problem',
                      {params: {course: course, set_id: set_id, problem_id: problem_id}});
         },
-        createFilterFunction: function(name, course, author, code, set_id, problem_id, function_type){
+        createFilterFunction: function(name, course, author, code, set_id, problem_id, function_type, replace_mode){
             return $http
                 .post(BASE_URL+'/filter_functions',
                       {name: name, course: course, author: author, code: code, set_id: set_id,
-                       problem_id: problem_id, function_type: function_type});
+                       problem_id: problem_id, function_type: function_type, replace_mode: replace_mode || false});
         },
         updateFilterFunction: function(id, code){
             return $http

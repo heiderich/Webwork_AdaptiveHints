@@ -103,13 +103,22 @@
             <th>Filter Name</th>
             <th>Filter Description</th>
             <th>Filter Type</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="filter in filter_functions" dt-rows="" ng-click="show_filter_code(filter.code)">
-            <td>{{filter.name}}</td>
-            <td>{{filter.doc}}</td>
-            <td>{{filter.type}}</td>
+          <tr ng-repeat="filter in filter_functions" dt-rows="">
+            <td ng-click="show_filter_code(filter.code)">{{filter.name}}</td>
+            <td ng-click="show_filter_code(filter.code)">{{filter.doc}}</td>
+            <td ng-click="show_filter_code(filter.code)">{{filter.type}}</td>
+            <td ng-if="isFilterEditable(filter.doc || '')" ng-click="editFilter(filter)">
+              <button type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"></span>
+               Edit Filter
+             </button>
+            </td>
+            <td ng-if="!isFilterEditable(filter.doc || '')">
+              No Permission
+            </td>
           </tr>
         </tbody>
       </table>
@@ -140,7 +149,7 @@
       Filter Type <select id="filter_function_type"><option value="C">Conditional</option><option value="T">Time Based</option></select>
       <button type="button" class="btn btn-primary btn-xs" ng-click="generate_filter_template()">Generate Filter Template</button>
       <form class="form-inline">
-        <div ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
+        <div id="codeMirrorContainer" ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
         <div class="row">
           <button type="button" class="btn btn-success" ng-click="run_filter()"><span class="glyphicon glyphicon-play"></span> Run Filter</button>
           <a class="btn btn-info hidden" id="downloadFilterDataLink">Download Filter Output</a>

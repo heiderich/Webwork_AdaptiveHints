@@ -131,12 +131,16 @@ class FilterFunctions(ProcessQuery):
         #ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
-        self.filter_bank.add_filter(name,code)
-        save_to = os.path.abspath(os.path.join(self.filters_dir, name))
-        with open(save_to+'.py', 'w') as f:
-            f.write(code)
+        add_result = self.filter_bank.add_filter(name, code, replace=self.get_argument('replace_mode') == "True")
+        if add_result == None:
+            save_to = os.path.abspath(os.path.join(self.filters_dir, name))
+            with open(save_to+'.py', 'w') as f:
+                f.write(code)
+            add_result = {'flag': 1}
+        else:
+            add_result = {'flag': 0, 'message': add_result}
 
-        #self.write(json.dumps(ret))
+        self.write(json.dumps(add_result))
 
     def put(self):
         id = self.get_argument('id')
