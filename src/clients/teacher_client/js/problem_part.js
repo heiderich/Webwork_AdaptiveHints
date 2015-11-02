@@ -445,7 +445,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             author: Session.user_id,
             course: course,
             dirty: true,
-            name: null
+            name: $scope.filter_function_name
         };
     }
 
@@ -508,6 +508,23 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         $scope.showGroups = ! $scope.showGroups;
     };
 
+    $scope.isFilterEditable = function(filterDoc) {
+        return filterDoc.indexOf($scope.user_id) !== -1;
+    }
+
+    $scope.editFilter = function(filter) {
+        $scope.filter_function = {
+            code: "def " + filter.name + "(params):\n" + filter.code,
+            author: Session.user_id,
+            course: course,
+            dirty: true,
+            name: filter.name,
+            replaceMode: true
+        };
+        $scope.editorOptions.readOnly = false;
+        $("#codeMirrorContainer")[0].scrollIntoView();
+    }
+
     var loadfilters = function(){
         HintsService.getFilterFunctions().success(function(funcs){
             angular.forEach(funcs, function(filter) {
@@ -540,8 +557,10 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
         //if(!ff.id){
             HintsService.createFilterFunction(
                 ff.name, ff.course, ff.author, ff.code,
-                ff.set_id, ff.problem_id).success(function(new_ff_id){
-                    ff.id = new_ff_id;
+                ff.set_id, ff.problem_id, null, ff.replaceMode || false).success(function(response){
+                    if (!response.flag) {
+                        $scope.filter_output = response.message;
+                    }
                     loadfilters();
                 });
 
