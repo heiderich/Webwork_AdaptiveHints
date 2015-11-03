@@ -13,6 +13,7 @@ import traceback
 from TimeoutError import timeout # a decorator that creates a time-out interrupt for a given function.
 import StringIO
 import inspect
+import os
 
 class filter_bank:
     def __init__(self):
@@ -84,6 +85,9 @@ class filter_bank:
                 return 'code failed to generate new function named '+name+'old definition retained\n'+message
             else:
                 return 'code failed to generate function named '+name+'\n'+message
+
+    def remove_filter(self, filtername, filter_dir):
+        os.remove(filter_dir + filtername + ".py")
 
     def exec_filter(self,filtername,input):
         """ execute a filter on a given input.
