@@ -24,8 +24,6 @@ def get_part_answer(pg_file, part_id):
     # Matches answers with Compute() and without in separate groups
     answer_re = re.compile('\[__+\]{(?:(?:Compute\(")(.+?)(?:"\))(?:.*)|(.+?))}')
     answer_boxes = answer_re.findall(pg_file)
-    logger.info("Zhen box")
-    logger.info(answer_boxes)
     if part_id <= len(answer_boxes):
         part_answer = answer_boxes[part_id-1][0] or answer_boxes[part_id-1][1]
     else:

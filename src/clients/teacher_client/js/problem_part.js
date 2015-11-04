@@ -519,6 +519,14 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     };
     loadfilters();
 
+    var loadFilterHelpers = function(){
+        HintsService.getFilterHelpers().success(function(helpers){
+            $("#filter_table").DataTable().destroy();
+            $scope.filter_helpers = helpers;
+        });
+    };
+    loadFilterHelpers();
+
     $scope.$watch('filter_function.name', function(newVal, oldVal){
         if(newVal){
             delete $scope.filter_function.id;
