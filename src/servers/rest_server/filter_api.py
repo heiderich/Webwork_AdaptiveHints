@@ -325,7 +325,7 @@ class ApplyFilterFunctions(ProcessQuery):
                             logger.info(func['name'])
                             success,txt,_ = self.filter_bank.exec_filter(func['name'], answer_data)#self.exec_filter_func(func['code'], answer_data, user_variables)
                             #TODO: remove the length check when things become reliable
-                            if txt != "" and success and len(txt) < 100:
+                            if txt != "" and success and len(txt) < 300:
                                 filter_function_name = func['name']
                                 break
                             else:
