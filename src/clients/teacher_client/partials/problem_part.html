@@ -103,13 +103,22 @@
             <th>Filter Name</th>
             <th>Filter Description</th>
             <th>Filter Type</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr ng-repeat="filter in filter_functions" dt-rows="" ng-click="show_filter_code(filter.code)">
-            <td>{{filter.name}}</td>
-            <td>{{filter.doc}}</td>
-            <td>{{filter.type}}</td>
+          <tr ng-repeat="filter in filter_functions" dt-rows="">
+            <td ng-click="show_filter_code(filter.code)">{{filter.name}}</td>
+            <td ng-click="show_filter_code(filter.code)">{{filter.doc}}</td>
+            <td ng-click="show_filter_code(filter.code)">{{filter.type}}</td>
+            <td ng-if="isFilterEditable(filter.doc || '')" ng-click="editFilter(filter)">
+              <button type="button" class="btn btn-primary btn-sm"><span class="glyphicon glyphicon-pencil"></span>
+               Edit Filter
+             </button>
+            </td>
+            <td ng-if="!isFilterEditable(filter.doc || '')">
+              No Permission
+            </td>
           </tr>
         </tbody>
       </table>
@@ -140,11 +149,16 @@
       Filter Type <select id="filter_function_type"><option value="C">Conditional</option><option value="T">Time Based</option></select>
       <button type="button" class="btn btn-primary btn-xs" ng-click="generate_filter_template()">Generate Filter Template</button>
       <form class="form-inline">
-        <div ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
+        <div id="codeMirrorContainer" ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
+        <div class="row">
+          <a href="https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols" target="_blank">LaTeX Symbols</a> | 
+          <a href="https://courses1.webwork.maa.org/webwork2/cervone_course/PGML/1/?login_practice_user=true" target="_blank">Hint Editor</a>
+        </div>
         <div class="row">
           <button type="button" class="btn btn-success" ng-click="run_filter()"><span class="glyphicon glyphicon-play"></span> Run Filter</button>
           <a class="btn btn-info hidden" id="downloadFilterDataLink">Download Filter Output</a>
           <button type="button" class="btn btn-primary" ng-click="save_filter()" ng-disabled="!filter_function.dirty"><span class="glyphicon glyphicon-floppy-disk"></span> Save <span ng-show="filter_function.dirty">*</span></button>
+          <button type="button" class="btn btn-danger" ng-click="deleteFilter()" confirmation-needed="Are you sure you want to remove the filter?" ng-disabled="!show_delete_filter_button"><span class="glyphicon glyphicon-remove"></span> Delete</button>
           <button type="button" class="btn btn-primary" ng-click="send_hint_to_matches()" ng-disabled="linkHintDisabled()"><span class="glyphicon glyphicon-send"></span> Link Hint and Send to {{filtered_students.length}} Matching Students</button>
         </div>
       </form>

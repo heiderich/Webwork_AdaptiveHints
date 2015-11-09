@@ -99,7 +99,11 @@ class FilterFunctions(ProcessQuery):
         self.write(json.dumps(functions, default=serialize_datetime))
 
     def post(self):
-        ''' For creating filter functions. '''
+        ''' For creating and deleting filter functions. '''
+        delete_flag = self.get_argument('delete_filter', None)
+        if delete_flag != None and delete_flag == "True":
+            self.delete(self.get_argument('filter_name'))
+            return
         course = self.get_argument('course')
         set_id = self.get_argument('set_id', 'GenericFilterFunctions')
         problem_id = self.get_argument('problem_id', 1)
@@ -131,12 +135,16 @@ class FilterFunctions(ProcessQuery):
         #ret = conn.execute(create_filter_function) # Returns row ID
 
         # add filter function in filters folder
-        self.filter_bank.add_filter(name,code)
-        save_to = os.path.abspath(os.path.join(self.filters_dir, name))
-        with open(save_to+'.py', 'w') as f:
-            f.write(code)
+        add_result = self.filter_bank.add_filter(name, code, replace=self.get_argument('replace_mode') == "True")
+        if add_result == None:
+            save_to = os.path.abspath(os.path.join(self.filters_dir, name))
+            with open(save_to+'.py', 'w') as f:
+                f.write(code)
+            add_result = {'flag': 1}
+        else:
+            add_result = {'flag': 0, 'message': add_result}
 
-        #self.write(json.dumps(ret))
+        self.write(json.dumps(add_result))
 
     def put(self):
         id = self.get_argument('id')
@@ -157,8 +165,8 @@ class FilterFunctions(ProcessQuery):
         #self.write(json.dumps(ret))
         #logger.debug(self.filter_path(id))
         
-    def delete(self):
-        pass
+    def delete(self, filter_name):
+        self.filter_bank.remove_filter(filter_name, self.filters_dir)
 
 # def apply_filter(answer_data, user_vars, filter_function_string, pipe):
 #     import os
@@ -266,6 +274,7 @@ class ApplyFilterFunctions(ProcessQuery):
         correct_set_problem_part = str(set_id) + "_" + str(problem_id) + "_" + str(part_id)
 
         logger.info(user_id)
+        logger.info(correct_set_problem_part)
         success = False
         filter_function_name = ""
 
