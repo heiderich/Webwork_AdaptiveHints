@@ -154,6 +154,7 @@
           <button type="button" class="btn btn-success" ng-click="run_filter()"><span class="glyphicon glyphicon-play"></span> Run Filter</button>
           <a class="btn btn-info hidden" id="downloadFilterDataLink">Download Filter Output</a>
           <button type="button" class="btn btn-primary" ng-click="save_filter()" ng-disabled="!filter_function.dirty"><span class="glyphicon glyphicon-floppy-disk"></span> Save <span ng-show="filter_function.dirty">*</span></button>
+          <button type="button" class="btn btn-danger" ng-click="deleteFilter()" confirmation-needed="Are you sure you want to remove the filter?" ng-disabled="!show_delete_filter_button"><span class="glyphicon glyphicon-remove"></span> Delete</button>
           <button type="button" class="btn btn-primary" ng-click="send_hint_to_matches()" ng-disabled="linkHintDisabled()"><span class="glyphicon glyphicon-send"></span> Link Hint and Send to {{filtered_students.length}} Matching Students</button>
         </div>
       </form>

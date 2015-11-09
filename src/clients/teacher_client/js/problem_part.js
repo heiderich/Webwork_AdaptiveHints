@@ -1,5 +1,21 @@
 var App = angular.module('ta-console');
 
+App.directive('confirmationNeeded', function () {
+  return {
+    priority: 1,
+    terminal: true,
+    link: function (scope, element, attr) {
+      var msg = attr.confirmationNeeded || "Are you sure?";
+      var clickAction = attr.ngClick;
+      element.bind('click',function () {
+        if ( window.confirm(msg) ) {
+          scope.$eval(clickAction)
+        }
+      });
+    }
+  };
+});
+
 App.controller('ProblemPartCtrl', function($scope, $location, $window, $stateParams,
                                            $sce, $timeout, $interval, $anchorScroll, $modal, $log,
                                            WebworkService, HintsService, SockJSService, APIHost,
@@ -43,6 +59,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
     $scope.hints = [];
     $scope.filtered_students = [];
     $scope.filtered_groups = [];
+    $scope.show_delete_filter_button = false;
 
     $scope.filter_function_name = "answer_filter";
 
@@ -521,8 +538,20 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             name: filter.name,
             replaceMode: true
         };
+        $scope.show_delete_filter_button = true;
         $scope.editorOptions.readOnly = false;
         $("#codeMirrorContainer")[0].scrollIntoView();
+    }
+
+    $scope.deleteFilter = function() {
+        HintsService.deleteFilter($scope.filter_function.name).success(function(data){
+            $scope.show_delete_filter_button = false;
+            loadfilters();
+            $scope.filter_function = {
+                code: "Please enter filter name and then click on Generate Filter Template to start writing filter functions."
+            }
+            $scope.editorOptions.readOnly = true;
+        });
     }
 
     var loadfilters = function(){
@@ -659,7 +688,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
 
     $scope.show_filter_code = function(filter_code) {
         $("#filter_code_read_only_container").removeClass("hidden");
-        $("#filter_code_read_only").html(filter_code);
+        $("#filter_code_read_only").text(filter_code);
         $("#filter_code_read_only_container")[0].scrollIntoView();
     }
 });

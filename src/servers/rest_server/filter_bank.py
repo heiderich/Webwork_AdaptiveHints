@@ -86,8 +86,9 @@ class filter_bank:
             else:
                 return 'code failed to generate function named '+name+'\n'+message
 
-    def remove_filter(self, filtername, filter_dir):
-        os.remove(filter_dir + filtername + ".py")
+    def remove_filter(self, filter_name, filter_dir):
+        if self.env.has_key(filter_name):
+            os.remove(filter_dir + filter_name + ".py")
 
     def exec_filter(self,filtername,input):
         """ execute a filter on a given input.

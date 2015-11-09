@@ -139,6 +139,11 @@ App.factory('HintsService', function($http, $window, $rootScope, $location, $q, 
                 }.bind(this, students[i]), 2000*Math.random());
             }
 
+        },
+        deleteFilter: function(filterName) {
+            return $http
+                .post(BASE_URL+'/filter_functions',
+                      {filter_name: filterName, delete_filter: true});
         }
     };
     return factory;
