@@ -274,6 +274,7 @@ class ApplyFilterFunctions(ProcessQuery):
         correct_set_problem_part = str(set_id) + "_" + str(problem_id) + "_" + str(part_id)
 
         logger.info(user_id)
+        logger.info(correct_set_problem_part)
         success = False
         filter_function_name = ""
 
