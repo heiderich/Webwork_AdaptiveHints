@@ -151,6 +151,10 @@
       <form class="form-inline">
         <div id="codeMirrorContainer" ng-model="filter_function.code" ui-codemirror="" ui-codemirror-opts="editorOptions" ng-change="filterFunctionChanged();"></div>
         <div class="row">
+          <a href="https://oeis.org/wiki/List_of_LaTeX_mathematical_symbols" target="_blank">LaTeX Symbols</a> | 
+          <a href="https://courses1.webwork.maa.org/webwork2/cervone_course/PGML/1/?login_practice_user=true" target="_blank">Hint Editor</a>
+        </div>
+        <div class="row">
           <button type="button" class="btn btn-success" ng-click="run_filter()"><span class="glyphicon glyphicon-play"></span> Run Filter</button>
           <a class="btn btn-info hidden" id="downloadFilterDataLink">Download Filter Output</a>
           <button type="button" class="btn btn-primary" ng-click="save_filter()" ng-disabled="!filter_function.dirty"><span class="glyphicon glyphicon-floppy-disk"></span> Save <span ng-show="filter_function.dirty">*</span></button>
