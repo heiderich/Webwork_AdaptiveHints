@@ -10,5 +10,5 @@
 
 #### Toturial files for writing hints ####
 * [Filter_Interface.md](https://github.com/cse103/Webwork_AdaptiveHints/blob/master/tutorial/Filter_Interface.md) -> The interface with a filter function. THe inputs: `params` and the returned values.* [filter_helpers.md](https://github.com/cse103/Webwork_AdaptiveHints/blob/master/tutorial/filter_helpers.md) -> Explains the filters_helpers that are used to write sophisticated conditional hints.
-* [create_new_hints.md](https://github.com/cse103/Webwork_AdaptiveHints/blob/master/tutorial/create_new_hints.md) -> A guide to creating new hints, and to analyzing the attempt logs using `FindmatchingSubExpressions.py`
+* [create_new_hints.md](https://github.com/cse103/Webwork_AdaptiveHints/blob/master/tutorial/create_new_hints.md) -> A guide to creating new hints, and to analyzing the attempt logs using `FindMatchingSubexpressions.py`
 * [Filter_Interface.md](https://github.com/cse103/Webwork_AdaptiveHints/blob/master/tutorial/Filter_Interface.md) -> The interface with a filter function. THe inputs: `params` and the returned values.
