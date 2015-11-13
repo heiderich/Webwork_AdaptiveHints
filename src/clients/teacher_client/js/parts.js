@@ -2,10 +2,12 @@ var App = angular.module('ta-console');
 
 App.controller('PartsCtrl', function($scope, $location, $window, $stateParams, $interval,
                                       WebworkService, SockJSService,
-                                      DTOptionsBuilder, DTColumnDefBuilder, CurrentCourse){
+                                      DTOptionsBuilder, DTColumnDefBuilder, CurrentCourse, cfpLoadingBar){
     var course = $scope.course = $stateParams.course;
     CurrentCourse.name = $scope.course;
     WebworkService.answersByPartCounts(course).success(function(data){
+        cfpLoadingBar.start();
+        cfpLoadingBar.set(0.2);
         $scope.answers_by_part = data;
     });
 
@@ -27,5 +29,6 @@ App.controller('PartsCtrl', function($scope, $location, $window, $stateParams, $
             asExpandedGroups: [],
         });
         loadedDT.DataTable && loadedDT.DataTable.search("week").draw();
+        cfpLoadingBar.complete();
     });
 });

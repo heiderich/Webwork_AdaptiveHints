@@ -1,11 +1,11 @@
 var App = angular.module(
     'ta-console',
-    ['ngRoute', 'ngSanitize', 'datatables', 'ta-console.directives',
+    ['angular-loading-bar', 'ngRoute', 'ngSanitize', 'datatables', 'ta-console.directives',
     'smart-table', 'angularMoment', 'ui.codemirror', 'ui.bootstrap',
     'mgcrea.ngStrap', 'mgcrea.ngStrap.helpers.dimensions',
     'mgcrea.ngStrap.scrollspy', 'ui.router', 'ui.bootstrap.typeahead']);
 
-var directives = angular.module('ta-console.directives', []);
+var directives = angular.module('ta-console.directives', ['angular-loading-bar']);
 
 App.config(
     ['$httpProvider', '$locationProvider', '$stateProvider',
