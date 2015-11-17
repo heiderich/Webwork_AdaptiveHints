@@ -66,7 +66,11 @@ def find_Hits(List,tol = 1+1e-6):
     item1=List[0]
     for item2 in List[1:]:
         logger.debug(str(item1[:2])+str(item2[:2]))
-        ratio=item1[0]/item2[0]
+        if item2[0]>1 or item2[0]<-1:
+            ratio=item1[0]/item2[0]
+        else:  #If numbers btwn [-1,1] shift to [1,3]
+            ratio=(item1[0]+2.0)/(item2[0]+2.0)
+
         if item1[1]!=item2[1] and ratio <tol and ratio>(1/tol):
             if item1[1]=='c':
                 Hits.append((item1,item2))
@@ -144,7 +148,7 @@ def find_matches(params):
     return final_matches
 
 if __name__=="__main__":
-    sys.path.append('../../..')
+    sys.path.append('../src')
     from parsetrees.expr_parser.Eval_parsed import parse_and_eval
     from collections import Counter
 

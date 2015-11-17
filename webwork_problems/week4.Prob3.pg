@@ -1,0 +1,119 @@
+DOCUMENT();        # This should be the first executable line in the problem.
+
+loadMacros(
+  "PGstandard.pl",
+  "PGML.pl",
+  "MathObjects.pl",
+  "PGcourse.pl",
+);
+
+Context("Numeric");
+
+Context()->flags->set(tolerance=>0.01);
+
+TEXT(beginproblem);
+$showPartialCorrectAnswers = 1;
+
+$rand_question = random(0,3,1);
+######################################################################
+
+if ($rand_question == 0) {
+BEGIN_PGML
+Below is the CDF of a mixture distribution with *two* components.
+
+All parameters of component distributions are small multiples of 0.5.
+
+Component weights take on multiples of 0.05 and they need to sum to one.
+
+END_PGML
+BEGIN_TEXT
+$BR
+\{ image("mixture_cdf_1.png", width=>400, height=>320) \}
+END_TEXT
+BEGIN_PGML
+
+This distribution can be expressed as a mixture of two: a normal distribution and a point mass:
+[`p_1 N(\mu,\sigma) + p_2 PM(a)`]
+
+- The normal component [`N(\mu,\sigma)`] has parameters [`\mu=`][______]{-2.0}, and [`\sigma=0.5`]. Its component weight is 
+[`p_1=`][_____]{0.5}
+- The point mass [`PM(a)`] is at location [`a=-0.5`]. Its component weight is [`p_2=`][_____]{0.5}
+END_PGML
+}
+
+if ($rand_question == 1) {
+BEGIN_PGML
+Below is the CDF of a mixture distribution with *two* components.
+
+All parameters of component distributions are small multiples of 0.5.
+
+Component weights take on multiples of 0.05 and they need to sum to one.
+
+END_PGML
+BEGIN_TEXT
+$BR
+\{ image("mixture_cdf_2.png", width=>400, height=>320) \}
+END_TEXT
+BEGIN_PGML
+
+This distribution can be expressed as a mixture of two: an exponential distribution and a uniform distribution
+[`p_1 Exp(\lambda) + p_2 U(a,b)`]
+
+Identify the component distributions:
+
+- The exponential component has [`\lambda`] of 0.5. Its component weight is [_____]{0.4}
+- Uniform component on the interval [`[a,b]`]=[[_______]{2.0},[_____]{3.5}]. Its component weight is [`p_2=0.6`]
+END_PGML
+}
+
+if ($rand_question == 2) {
+BEGIN_PGML
+Below is the CDF of a mixture distribution with *two* components.
+
+All parameters of component distributions are small multiples of 0.5.
+
+Component weights take on multiples of 0.05 and they need to sum to one.
+
+END_PGML
+BEGIN_TEXT
+$BR
+\{ image("mixture_cdf_18.png", width=>400, height=>320) \}
+END_TEXT
+BEGIN_PGML
+
+This distribution can be expressed as a mixture of two: an exponential distribution and a uniform distribution
+[`p_1 Exp(\lambda) + p_2 U(a,b)`]
+
+Identify the component distributions:
+
+- The exponential component has [`\lambda`] of 1.5. Its component weight is [`p_1=`][_____]{0.55}
+- Uniform component on the interval ([_______]{-4.5},[_____]{-2.0}). Its component weight is [`p_2=0.45`]
+END_PGML
+}
+
+if ($rand_question == 3) {
+BEGIN_PGML
+Below is the CDF of a mixture distribution with *two* components.
+
+All parameters of component distributions are small multiples of 0.5.
+
+Component weights take on multiples of 0.05 and they need to sum to one.
+
+END_PGML
+BEGIN_TEXT
+$BR
+\{ image("mixture_cdf_10.png", width=>400, height=>320) \}
+END_TEXT
+BEGIN_PGML
+
+This distribution can be expressed as a mixture of two: an exponential distribution and a point-mass distribution
+[`p_1 Exp(\lambda) + p_2 PM(a)`]
+
+Identify the component distributions:
+
+- The exponential component has [`\lambda=`] of 1.0. Its component weight is [`p_1=`][_____]{0.3}
+- Point mass on [`a=`][_______]{2.0}. Its component weight is [`p_2=`][_____]{0.7}
+END_PGML
+}
+
+ENDDOCUMENT();        # This should be the last executable line in the problem.
