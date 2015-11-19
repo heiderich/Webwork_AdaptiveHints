@@ -117,6 +117,7 @@ def handle_comma_separated_number(expr):
 
 # Parsing rules
 precedence = (
+    ('nonassoc','VARIABLE'),
     ('left','LIST'),
     ('nonassoc','COMMA'),
     ('left','IMPL_TIMES'),
@@ -127,8 +128,9 @@ precedence = (
     ('left','FACTORIAL'),
     ('nonassoc','CHOOSE'),
     ('nonassoc','PERMUTE'),
-    ('nonassoc','Q')
-    )
+    ('nonassoc','Q'),
+    ('nonassoc','COMPUTE')
+)
 
 def p_statement_expr_list(p):
     '''statement : expression
@@ -197,6 +199,7 @@ def p_factor_q(t):
               | Q LPAREN expression RPAREN %prec Q'''
     t[0] = ['Q', t[3]]
     t[0]=add_header(t)
+
 
 def p_expression_group(t):
     '''factor : LPAREN expression RPAREN
@@ -267,16 +270,24 @@ def p_nonempty_list(t):
         t[0] = ['list',t[1] + [t[2],]]
     t[0]=add_header(t)
 
-def p_expression_number_variable(t):
-    '''factor    : NUMBER
-                 | VARIABLE '''
-
+def p_factor_number(t):
+    '''factor  : NUMBER'''
     pos=t.lexpos(0)
-    #print 'Got number ',str(t[1]),
-    #print 'start=',pos,'length=',len(str(t[1]))
-    #print "'('X',(%1d,%1d),%s)"%(pos,pos+len(str(t[1])),str(t[1]))
+    print 'p_expression_number',t[1],pos
 
     t[0]=[['X',[pos,pos+len(str(t[1]))-1]],t[1]]
+
+def p_factor_variable(t):
+    '''factor   : VARIABLE %prec VARIABLE'''
+    pos=t.lexpos(0)
+    var=t[1];
+    global variables
+    if var in variables.keys():
+        variables[var].append(pos)
+    else:
+        variables[var]=[pos]
+    
+    t[0]=[['V',[pos,pos+len(str(t[1]))-1]],t[1]]
 
 
 def p_error(p):
@@ -305,13 +316,14 @@ parser = yacc.yacc(debug=True)
 #yacc.yacc(debug=True,debuglog=log,errorlog=log)
 
 def parse_webwork(expr):
+    global variables
+    variables={} # a list that stores the locations in which each variable appears.
     parsed = handle_comma_separated_number(expr)
     if parsed is None: #didn't match comma_separated_number, so parse expr
         try:
-            #parsed = parser.parse(expr,tracking=True,debug=log, lexer=lexer.lexer)
             parsed = parser.parse(expr,tracking=True, lexer=lexer.lexer)
             final_range=fix_ranges(parsed)
-            #print 'final_range=',final_range
+            print 'final_range=',final_range
         except  WebworkParseException as e:
             log.error('||%s|| %s', expr, e)
             log.exception(e)
@@ -320,7 +332,7 @@ def parse_webwork(expr):
             log.error('||%s|| %s', expr, e)
             log.exception(e)
             parsed = None
-    return parsed
+    return parsed,variables
 
 def fix_ranges(p):
     """the goal of this function s to fix a bug(?) in ply.yacc which is
@@ -330,8 +342,7 @@ def fix_ranges(p):
     """
     #print 'entered fix_ranges with input  '+str(p),type(p)
     try:
-        if p[0][0]=='X':
-            #print 'fix ranges found a number'
+        if p[0][0] in ['X','V']:  # found a leaf: a number or a variable name
             pass
         elif type(p[0][0])==str and type(p[0][1])==list and type(p[0][1][0])==int and type(p[0][1][1])==int:
             #print 'fix_ranges found a list whose head is operator,range'
