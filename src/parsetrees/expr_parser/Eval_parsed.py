@@ -1,6 +1,7 @@
 from math import factorial
 import linecache
 import sys
+print string import replace
 from webwork_parser import parse_webwork, WebworkParseException, node_string
 import traceback
 import operator as op
@@ -66,7 +67,7 @@ def eval_parsed(e, label='R'):
             return float(ev[0][1])
         
     try:
-        #print 'eval_parsed, e="',e,'"'
+        print 'eval_parsed, e="',e,'"'
         if type(e)==type(None):
             return 0
         elif is_number(e)==1:
@@ -148,28 +149,42 @@ def numbers_and_exps(etree, string):
 
 def parse_and_collect_numbers(string):
     try:
-        parse_tree = parse_webwork(string)
-        eval_tree = eval_parsed(parse_tree)
-        eval_numbers = Collect_numbers(eval_tree)
-        return set(eval_numbers.keys())
+        parse_tree, variables = parse_webwork(string)
+        if len(variables)==0:
+            eval_tree = eval_parsed(parse_tree)
+            eval_numbers = Collect_numbers(eval_tree)
+            return set(eval_numbers.keys())
+        else: 
+            return Eval_with_Variables(string,variables)
     except:
         return set()
 
-def parse_and_eval(string):
-    expr = parse_webwork(string)
-    if expr:
-        try:
-            etree = eval_parsed(expr)
-            return etree
-        except:
-            return None
-    else:
-        return None
+def Eval_with_Variables(string,variables):
+
+    vars=variables.items();
+    tvals=[1,2,3]
+    L=len(tvals)
+    indexes=[0]*len(variables)
+    count=L**len(variables)
+    for i in range(count):
+        for j in range(L):
+            # To Be Continued
+            
+# def parse_and_eval(string):
+#     expr = parse_webwork(string)
+#     if expr:
+#         try:
+#             etree = eval_parsed(expr)
+#             return etree
+#         except:
+#             return None
+#     else:
+#         return None
 
 if __name__=="__main__":
     string=sys.argv[1]
     print 'input:::',string
-    tree=parse_webwork(string)
-    print 'output:::',tree
+    tree,variables=parse_webwork(string)
+    print 'output:::',tree, variables
     eval_tree=eval_parsed(tree)
     print 'Eval_tree:::',eval_tree
