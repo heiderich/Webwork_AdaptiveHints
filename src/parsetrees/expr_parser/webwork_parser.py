@@ -329,7 +329,7 @@ def parse_webwork(expr):
         try:
             parsed = parser.parse(expr,tracking=True, lexer=lexer.lexer)
             final_range=fix_ranges(parsed)
-            print 'final_range=',final_range
+            log.debug('final_range='+str(final_range))
         except  WebworkParseException as e:
             log.error('||%s|| %s', expr, e)
             log.exception(e)
