@@ -301,7 +301,11 @@ class FilterAnswers(JSONRequestHandler, tornado.web.RequestHandler):
 
         func_name = filter_function[4:filter_function.index('(')]
         status=self.filter_bank.add_filter(func_name,filter_function)
-        if status!=None:
+        #This is the case when a filter which is saved and run immediately
+        searchString = "Filter named: " + func_name + " already exists, the author of the function has to replace it"
+        if status != None and status.find(searchString) != -1:
+            print "Filter " + func_name + " which is in filter bank, is invoked " + status
+        elif status!=None:
             print "ERROR LOADING FUNCTION"+status
             return status
 

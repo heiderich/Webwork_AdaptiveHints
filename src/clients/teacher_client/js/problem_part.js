@@ -494,7 +494,11 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
             success(function(response){
                 //console.log(response);
                 $scope.filtered_list = response.matches;
-                $scope.filter_output = response.output;
+                if (response.output.length !== undefined && response.output.length == 0) {
+                    $scope.filter_output = "No output from filter"
+                } else {
+                    $scope.filter_output = response.output;
+                }
                 $scope.filtered_students = _.unique(_.pluck(response.matches, 'user_id'));
                 group_filter_output();
                 console.log($scope.filtered_students);
@@ -509,7 +513,7 @@ App.controller('ProblemPartCtrl', function($scope, $location, $window, $statePar
                 downloadFilterOutputLinkElement.removeClass("hidden");
             }).error(function(error){
                 console.error(error);
-                $scope.filter_output = 'An error occurred while trying to run filter.';
+                $scope.filter_output = 'An error occurred while trying to run filter.\n' + error;
             });
     };
 

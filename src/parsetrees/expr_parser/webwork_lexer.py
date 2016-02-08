@@ -4,7 +4,8 @@ import ply.lex as lex
 
 class WebworkLexer(object):
     tokens = (
-    'Q', 'CHOOSE', 'PERMUTE', 'VARIABLE', 'NUMBER', 'PLUS','MINUS','TIMES','DIVIDE', 'LPAREN','RPAREN','FACTORIAL', 'LSET', 'RSET','COMMA','EXP', 'LBRACKET', 'RBRACKET'
+        'Q', 'CHOOSE', 'PERMUTE', 'VARIABLE', 'NUMBER', 'PLUS','MINUS','TIMES','DIVIDE', 'LPAREN','RPAREN','FACTORIAL', \
+        'LSET', 'RSET','COMMA','EXP', 'LBRACKET', 'RBRACKET','COMPUTE'
     )
 
     # Tokens
@@ -23,23 +24,30 @@ class WebworkLexer(object):
     t_RBRACKET  = r'\]'
     t_LSET      = r'\{'
     t_RSET      = r'\}'
+    #t_QUOTE     = r"'"
+    #t_DBL_QUOTE = r'"'
+    t_COMPUTE   = r'Compute'
     t_COMMA     = r'\,'
-    t_VARIABLE  = r'\$[A-Za-z_]+[0-9]*'  # not sure why $ was optional, caused all kind of troube.
+    # switching from PERL variables, used to randomize the problem, to actual variables, assumed to be single characters.
+    t_VARIABLE  = r'(?<![A-Za-z])[ABD-OR-Za-z](?![A-Za-z])'
 
     def t_NUMBER(self, t):
         r'\d*\.?\d+(E(\+|\-)?\d+)?'
+        #print 'entered webwork_lexer.t_Number(%s)'%t.value
         try:
             t.value = int(t.value)
+            #print 'parsed as int'
         except ValueError:
             try:
                 t.value = float(t.value)
+                #print 'parsed as float'
             except ValueError:
                 print t
                 raise webwork_parser.WebworkParseException("LEXER: Trouble parsing float %s", t.value)
         return t
 
     # Ignored characters
-    t_ignore = " \t"
+    t_ignore = " \t\'\""
     
     def t_newline(self, t):
         r'\n+'
