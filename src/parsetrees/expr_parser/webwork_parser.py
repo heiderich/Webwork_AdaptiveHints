@@ -208,7 +208,13 @@ def p_expression_group(t):
               | LBRACKET factor RBRACKET
               '''
     t[0] = t[2]
-    #t[0]=add_header(t)
+
+def p_compute(t):
+    '''factor : COMPUTE LPAREN expression RPAREN
+              | COMPUTE LPAREN factor RPAREN
+              '''
+    t[0] = t[3]
+
 
 def p_expression_unbalanced_group(t):
     '''factor : LPAREN expression
@@ -273,7 +279,7 @@ def p_nonempty_list(t):
 def p_factor_number(t):
     '''factor  : NUMBER'''
     pos=t.lexpos(0)
-    print 'p_expression_number',t[1],pos
+    # print 'p_expression_number',t[1],pos
 
     t[0]=[['X',[pos,pos+len(str(t[1]))-1]],t[1]]
 
@@ -323,7 +329,7 @@ def parse_webwork(expr):
         try:
             parsed = parser.parse(expr,tracking=True, lexer=lexer.lexer)
             final_range=fix_ranges(parsed)
-            print 'final_range=',final_range
+            log.debug('final_range='+str(final_range))
         except  WebworkParseException as e:
             log.error('||%s|| %s', expr, e)
             log.exception(e)

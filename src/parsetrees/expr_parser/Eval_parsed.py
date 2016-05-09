@@ -1,10 +1,14 @@
 from math import factorial
 import linecache
-import sys
+import sys, traceback
+from string import replace
 from webwork_parser import parse_webwork, WebworkParseException, node_string
 import traceback
 import operator as op
 from scipy.stats import norm
+
+import logging 
+log=logging.getLogger(__name__)
 
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
@@ -13,7 +17,7 @@ def PrintException():
     filename = f.f_code.co_filename
     linecache.checkcache(filename)
     line = linecache.getline(filename, lineno, f.f_globals)
-    print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+    log.error('EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj))
 
 def is_number(s):
     try:
@@ -66,7 +70,7 @@ def eval_parsed(e, label='R'):
             return float(ev[0][1])
         
     try:
-        #print 'eval_parsed, e="',e,'"'
+        log.debug('eval_parsed, e="'+str(e)+'"')
         if type(e)==type(None):
             return 0
         elif is_number(e)==1:
@@ -148,28 +152,86 @@ def numbers_and_exps(etree, string):
 
 def parse_and_collect_numbers(string):
     try:
-        parse_tree = parse_webwork(string)
-        eval_tree = eval_parsed(parse_tree)
-        eval_numbers = Collect_numbers(eval_tree)
-        return set(eval_numbers.keys())
+        parse_tree, variables = parse_webwork(string)
+        if len(variables)==0:
+            eval_tree = eval_parsed(parse_tree)
+            eval_numbers = Collect_numbers(eval_tree)
+            return set(eval_numbers.keys())
+        else: 
+            return Eval_with_Variables(string,variables)
     except:
         return set()
 
-def parse_and_eval(string):
-    expr = parse_webwork(string)
-    if expr:
-        try:
-            etree = eval_parsed(expr)
-            return etree
-        except:
-            return None
-    else:
+def substitute(expression,variables,values):
+    """ Substitutes values for variables in an expression
+        expression: a string holding the expression
+        variables: (returned as a secnd value by parse_webwork)
+                   a list of tuples. Each tuple consists of two values:
+                    - The name of the variable (as a string)
+                    - The locations where the variable appears
+        values: A dictionary that relates a numerical value to each variable
+    """
+    if set(values.keys()) != set(variables.keys()):
+        raise Exception('substitute: there should be a exactly one value for each variable'+
+                        'variables='+str(variables),
+                        'values='+str(values));
+    #merge the location lists and put them in order
+    loc_list=[]
+    for name,locs in variables.items():
+        for L in locs:
+            loc_list.append((name,L))
+    loc_list=sorted(loc_list,key=lambda x:x[1])
+    
+    loc=0
+    sub_expression=''   # hold the buffer that will become the substituted expression
+    for var_name,new_loc in loc_list:
+        value=values[var_name]
+        if expression[new_loc:new_loc+len(var_name)] == var_name:
+            sub_expression+=expression[loc:new_loc]+str(value)
+            loc = new_loc+len(var_name)
+        else:
+            raise Exception(('Error in variable locations, expression=%s'+\
+                             ' variable name=%s, locations=%s')%\
+                              (expression,var_name,str(var_loc)))
+    sub_expression+=expression[loc:]
+    return sub_expression
+            
+def parse_and_eval(string,values=[]):
+    expr,variables = parse_webwork(string)
+    try:
+        if expr:
+            if len(variables)==0:
+                etree = eval_parsed(expr)
+                return etree,{}
+            if len(variables)!=len(values):
+                return expr,variables # if the number of values does
+                                      # not match number of variables,
+                                      # return the description of the
+                                      # variables.
+            else:
+                                      # if number of values matches
+                                      # number of variables then
+                                      # substitute values for
+                                      # variables and call parser
+                                      # again on numerical expression.
+                subs_string=substitute(string,variables,values)
+                subs_expr,variables=parse_webwork(subs_string)
+                assert len(variables)==0;
+                if subs_expr:
+                    etree=eval_parsed(subs_expr)
+                    return etree,{}
+                        
+        else:
+            raise Exception
+    except:
+        log.error('Exception in parse_and_eval, string=%s, parsed=%s'%(string,str(expr)))
+        traceback.print_exc(file=sys.stdout)
         return None
 
 if __name__=="__main__":
     string=sys.argv[1]
     print 'input:::',string
-    tree=parse_webwork(string)
-    print 'output:::',tree
+    tree,variables=parse_webwork(string)
+    print 'output:::',tree, variables
     eval_tree=eval_parsed(tree)
     print 'Eval_tree:::',eval_tree
